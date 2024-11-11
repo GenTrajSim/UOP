@@ -3,12 +3,14 @@ import glob
 from pymatgen.io.vasp.inputs import Poscar
 from pymatgen.core.structure import Structure
 import numpy as np
+import sys
 
 os.environ["MKL_NUM_THREADS"] = '1'
 os.environ["NUMEXPR_NUM_THREADS"] = '1'
 os.environ["OMP_NUM_THREADS"] = '1'
 
 cal_path = 'only1'
+cal_path = sys.argv[1]
 cal_path_poscar = '../SAVE/MultiPT/'+cal_path+'/56.panding.POSCAR'
 #POSCAR_path = glob.glob('../SAVE/MultiPT/P5000_T200/56.panding.POSCAR')
 POSCAR_path = glob.glob(cal_path_poscar)
