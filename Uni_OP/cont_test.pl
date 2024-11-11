@@ -1,5 +1,6 @@
 # 1.0_DAMN_liq20/MultiPT/P5000_T200
 my $cal_filename = 'only1';  #'P1_T230'
+$cal_filename = $ARGV[0]
 #
 sub read_OP_distribution {
 	open IN, "< ../SAVE/1.0_DAMN_liq20/MultiPT/$cal_filename/Uni-OP.txt";
