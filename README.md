@@ -6,7 +6,7 @@
  
  testing Data in SAVE/MultiPT/${ca_filenmae}/${1..i}.gro  AND  SAVE/MultiPT/${ca_filenmae}/${1..i}.POSCAR
  
---> Uni-OP/cont_test.sh ## **submit**
+--> Uni-OP/cont_test.sh ## **submit** Example: ca_filenmae="only1"
 
 --> SAVE/1.0_DAMN_liq20/MultiPT/${ca_filenmae}/{1..i}.lammpstrj ## **outputs**
 
