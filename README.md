@@ -16,5 +16,11 @@
  - Pull this model in SAVE/1.0_DAMN_liq20/checkpoint_COORD_1.00_vDAMN_ln_liq20/train
  - this model only train the 10 kinds of ice crystals and liquid at different P-T conditions
  - this only have 4 kinds of tokens (elements)
+ - ```python
+   dictionary = {'MASK':0, 'C':1, 'O':2, 'CLAS':3}
+   #Mask-> adding noises for masking elements;
+   #CLAS-> the special token for predicating the classifications of Local structures
+   #for training for new elements, need change this part of in Uni_OP_train_v1.py and 
+   ```
 
 author email: liwenl.sim@gmail.com
