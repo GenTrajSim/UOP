@@ -6,4 +6,5 @@ A universal Order Parameter Architecture for Crystallization
  testing Data in SAVE/MultiPT/${ca_filenmae}/${1..i}.gro   SAVE/MultiPT/${ca_filenmae}/${1..i}.POSCAR
  
 --> Uni-OP/cont_test.sh ## submit,      calculating file in SAVE/1.0_DAMN_liq20/MultiPT/${ca_filenmae}/
+
 --> SAVE/1.0_DAMN_liq20/MultiPT/${ca_filenmae}/{1..i}.lammpstrj ## outputs
