@@ -6,7 +6,7 @@
  - testing Data in SAVE/MultiPT/${ca_filenmae}/${1..i}.gro  AND  SAVE/MultiPT/${ca_filenmae}/${1..i}.POSCAR
  - --> Uni-OP/cont_test.sh ## **submit** Example:
    ```bash
-   ca_filenmae="only1" #working folder only1 -> change for your workfile
+   ca_filenmae="only1" #working folder only1 -> change for your working folder
    ```
  - --> SAVE/1.0_DAMN_liq20/MultiPT/${ca_filenmae}/{1..i}.lammpstrj ## **outputs**
 
