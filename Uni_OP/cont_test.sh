@@ -30,6 +30,7 @@ unset __conda_setup
 #conda deactivate
 #	/home/liwenli/scratch/SAVE/MultiPT/P5000_T200
 ca_filenmae="only1"
+ca_filenmae=$1
 ## 1..10
 for i in {1..1}
 do
@@ -48,10 +49,10 @@ do
 	echo "cp file $filename1 $filename3"
 	cp "$filename2" "$filename4"
 	echo "cp file $filename2 $filename4"
-	python3 POSCAR_npy_displacement.py
+	python3 POSCAR_npy_displacement.py $ca_filenmae
 	conda deactivate
 	conda activate tensorflow
-	perl cont_test.pl
+	perl cont_test.pl $ca_filenmae
 	cp "$filename77" "$filename8"
 	rm "$filename3"
 	rm "$filename4"
