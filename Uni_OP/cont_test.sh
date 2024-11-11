@@ -30,7 +30,7 @@ unset __conda_setup
 #conda deactivate
 #	/home/liwenli/scratch/SAVE/MultiPT/P5000_T200
 ca_filenmae="only1"
-ca_filenmae=$1
+#ca_filenmae=$1
 ## 1..10
 for i in {1..1}
 do
