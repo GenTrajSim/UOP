@@ -1,0 +1,7 @@
+tensorflow
+random
+numpy
+glob
+os
+sys
+scipy
