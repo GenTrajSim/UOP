@@ -43,7 +43,7 @@ open OU13,"+> ../SAVE/1.0_DAMN_liq20/MultiPT/$cal_filename/index13.txt";#
 open OU14,"+> ../SAVE/1.0_DAMN_liq20/MultiPT/$cal_filename/index14.txt";
 open OU20,"+> ../SAVE/1.0_DAMN_liq20/MultiPT/$cal_filename/index20.txt";
 for (my $i = 0; $i< 100; $i++) {
-	system("python3 test_liq_vDAMN2.py");
+	system("python3 Uni-OP_v0.2_testing.py");
 	system("cd ../SAVE/1.0_DAMN_liq20/MultiPT/$cal_filename/. && perl read2.pl");
 	open(RE, "< ../SAVE/1.0_DAMN_liq20/MultiPT/$cal_filename/OP17.txt");
 	my @re = <RE>;
