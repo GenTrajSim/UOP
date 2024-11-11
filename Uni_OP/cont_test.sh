@@ -44,6 +44,9 @@ do
 	filename7="../SAVE/1.0_DAMN_liq20/MultiPT/${ca_filenmae}/panding.lammpstrj"
 	filename77="../SAVE/1.0_DAMN_liq20/MultiPT/${ca_filenmae}/lammps_colour.lammpstrj"
 	filename8="../SAVE/1.0_DAMN_liq20/MultiPT/${ca_filenmae}/${i}.lammpstrj"
+	cp ../SAVE/1.0_DAMN_liq20/MultiPT/program/*pl ../SAVE/1.0_DAMN_liq20/MultiPT/${ca_filenmae}/.
+	cp ../SAVE/1.0_DAMN_liq20/MultiPT/program/*cpp ../SAVE/1.0_DAMN_liq20/MultiPT/${ca_filenmae}/.
+	g++ ../SAVE/1.0_DAMN_liq20/MultiPT/${ca_filenmae}/cj1.cpp -o ../SAVE/1.0_DAMN_liq20/MultiPT/${ca_filenmae}/cj -lpthread
 	conda activate my_pymatgen
 	cp "$filename1" "$filename3"
 	echo "cp file $filename1 $filename3"
