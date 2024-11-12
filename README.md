@@ -39,6 +39,7 @@
   ## This model has a total of 31 categories, but only 11 of them are trained and can be supplemented.
   ## If you go beyond 31 categories, you need to further modify the code.
   ```
+- More data can be added to train the Uni-OP, making it adaptable to more systems
 
   ### **Training**
   1. Traing dataset (different ice crystals) created by [genice](https://github.com/vitroid/GenIce)
