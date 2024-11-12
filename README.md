@@ -41,5 +41,16 @@
   ```
 
   ### **Training**
-  Traing dataset (different ice crystals) created by [genice](https://github.com/vitroid/GenIce)
+  1. Traing dataset (different ice crystals) created by [genice](https://github.com/vitroid/GenIce)
+
+     in Train/Data_111/create_ice_dis2.pl
+     
+  2. delete Hydrogen and virtual atoms, and create the POSCAR file
+
+     by using [ovito](https://www.ovito.org/docs/current/python/) (in xx.py)
+     
+  3. POSCAR -> coord/*.npy by using [pymatgen](https://pymatgen.org/)
+ 
+     in xx.py
+
 author email: liwenl.sim@gmail.com
