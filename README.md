@@ -53,4 +53,9 @@
  
      in Train/Data_111/POSCAR_npy_displacement.py
 
+  4. Then, adding the Train_path in Train/Uni_OP_train_v1.py
+     ```python
+     path_coord = 
+     ```
+
 author email: liwenl.sim@gmail.com
