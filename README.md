@@ -73,7 +73,7 @@
                     new_coord, real_coord, 
                     new_dist, real_dist, 
                     loss_x_norm, loss_delta_encoder_pair_rep_norm, 
-                    len_dictionary =4,
+                    len_dictionary =4,  ## dictionary = {'MASK':0, 'C':1, 'O':2, 'CLAS':3}
                     masked_token_loss = 1.0, crysral_class_loss =1.0,
                     masked_coord_loss = 1.0, masked_dist_loss =1.0,
                     x_norm_loss =1.0, delta_pair_repr_norm_loss =1.0):
