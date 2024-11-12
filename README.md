@@ -72,7 +72,7 @@
   - token
   - coord
   - dist
-  - classify
+  - classification
   ```python
   def loss_function_1(pred_token, orign_token, 
                     pred_crystal, real_crystal, 
