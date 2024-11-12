@@ -1,5 +1,4 @@
-# Uni-OP
-**A universal Order Parameter Architecture for Crystallization**
+# **Uni-OP** A universal Order Parameter Architecture for Crystallization**
 ![model](https://github.com/user-attachments/assets/6b09e08e-56d1-45e7-ae39-32fc9fa669fe)
 
  ### **Using**   
