@@ -45,16 +45,18 @@
   1. Traing dataset (different ice crystals) created by [genice](https://github.com/vitroid/GenIce)
 
      in Train/Data_111/create_ice_dis2.pl
+
+     Only standard crystals are required.
      
-  2. delete Hydrogen and virtual atoms, and create the POSCAR file
+  3. delete Hydrogen and virtual atoms, and create the POSCAR file
 
      by using [ovito](https://www.ovito.org/docs/current/python/) (in Train/Data_111/ovitos_gro_poscar_d.py)
      
-  3. POSCAR -> coord/*.npy by using [pymatgen](https://pymatgen.org/)
+  4. POSCAR -> coord/*.npy by using [pymatgen](https://pymatgen.org/)
  
      in Train/Data_111/POSCAR_npy_displacement.py
 
-  4. Adding the Train_path in Train/Uni_OP_train_v1.py
+  5. Adding the Train_path in Train/Uni_OP_train_v1.py
      ```python
      path_coord = glob.glob('./Data_111/displacement/coord/*.npy')
                 + glob.glob('./Data_111/displacement2/coord/*.npy')
@@ -63,7 +65,7 @@
                 + glob.glob('./Data_111/displacement3/coord/*.npy')
                 + ...
      ```
-  5. Carrying out Train/Uni_OP_train_v1.py and Training new models
+  6. Carrying out Train/Uni_OP_train_v1.py and Training new models
   ### **Loss Function**
   the number “131” = "130" + "1". "130" represents the maximum number of particles contained in a Local structure. "1" represents the central atom.
 
