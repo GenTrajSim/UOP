@@ -47,7 +47,7 @@
      
   2. delete Hydrogen and virtual atoms, and create the POSCAR file
 
-     by using [ovito](https://www.ovito.org/docs/current/python/) (in xx.py)
+     by using [ovito](https://www.ovito.org/docs/current/python/) (in Train/Data_111/ovitos_gro_poscar_d.py)
      
   3. POSCAR -> coord/*.npy by using [pymatgen](https://pymatgen.org/)
  
