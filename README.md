@@ -51,6 +51,6 @@
      
   3. POSCAR -> coord/*.npy by using [pymatgen](https://pymatgen.org/)
  
-     in xx.py
+     in Train/Data_111/POSCAR_npy_displacement.py
 
 author email: liwenl.sim@gmail.com
