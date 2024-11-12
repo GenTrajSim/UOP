@@ -1,7 +1,7 @@
 # Uni-OP
 **A universal Order Parameter Architecture for Crystallization**
 
- ### **USING**   
+ ### **Using**   
  - working sub_pathname: ${ca_filenmae}, dealing filenames: ${1..i}.gro and {1..i}.POSCAR
  - testing Data in SAVE/MultiPT/${ca_filenmae}/${1..i}.gro  AND  SAVE/MultiPT/${ca_filenmae}/${1..i}.POSCAR
  - --> Uni-OP/cont_test.sh ## **submit** Example:
@@ -39,4 +39,7 @@
   ## This model has a total of 31 categories, but only 11 of them are trained and can be supplemented.
   ## If you go beyond 31 categories, you need to further modify the code.
   ```
+
+  ### **Training***
+  
 author email: liwenl.sim@gmail.com
