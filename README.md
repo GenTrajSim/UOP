@@ -74,20 +74,14 @@
                     masked_token_loss = 1.0, crysral_class_loss =1.0,
                     masked_coord_loss = 1.0, masked_dist_loss =1.0,
                     x_norm_loss =1.0, delta_pair_repr_norm_loss =1.0):
-    #mask_token = tf.cast(tf.not_equal(orign_token, 0), dtype=tf.int32)
+    # because of dictionary = {'MASK':0, 'C':1, 'O':2, 'CLAS':3}, need neglect MASK and CLAS tokens.
+    # if adding new new elements, need make some changes
     mask_token = tf.cast(tf.where(tf.not_equal(orign_token, 0)&tf.not_equal(orign_token,3),1,0), dtype=tf.int32) #####   3->classify need change in different object
-    ##########!!!
     pred_t_One = tf.math.argmax(tf.nn.log_softmax(pred_token, axis=-1),-1)
     mask_tokenP= tf.cast(tf.where(tf.not_equal(pred_t_One , 0)&tf.not_equal(pred_t_One ,3),1,0), dtype=tf.int32) #####   3->classify need change in different object
-    ##########!!!
     mask_token_classify = tf.cast(tf.not_equal(orign_token, 0), dtype=tf.int32)
-    #NO_padding_clas = tf.cast(tf.not_equal(orign_token, len_dictionary-1), dtype=tf.int32)
-    #mask_token = mask_token * NO_padding_clas
-    #sample_size = tf.reduce_sum(mask_token, axis = -1)  
     orign_token = orign_token * mask_token_classify
-    #pred_token = pred_token*NO_padding_clas
     token_loss = loss_object(orign_token,tf.nn.log_softmax(pred_token,axis=-1))
-    ####
     crystal_loss = loss_object_cry(real_crystal, tf.nn.log_softmax(pred_crystal,axis=-1))
     ##liquid_mask
     crystal_mask_coord = tf.cast(tf.where(tf.not_equal(real_crystal,0),1,0),tf.float32) 
@@ -105,8 +99,6 @@
     crystal_mask_dist2 = tf.tile(tf.expand_dims(crystal_mask_dist2,-1),multiples=[1,131]) ###check
     crystal_mask_dist2 = tf.tile(tf.expand_dims(crystal_mask_dist2,-1),multiples=[1,1,131]) ###check
     crystal_mask_dist  = crystal_mask_dist + crystal_mask_dist2
-    #crystal_mask_dist  = tf.tile(tf.expand_dims(crystal_mask_dist, -1),multiples=[1,tf.shape(real_dist)[-3],1])
-    #crystal_mask_dist  = tf.tile(tf.expand_dims(crystal_mask_dist, -1),multiples=[1,1,tf.shape(real_dist)[-1],tf.shape(real_dist)[-1]])
     ####
     if new_coord is not None:
         coord_loss = tf.compat.v1.losses.huber_loss(
