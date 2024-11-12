@@ -40,6 +40,6 @@
   ## If you go beyond 31 categories, you need to further modify the code.
   ```
 
-  ### **Training***
+  ### **Training**
   
 author email: liwenl.sim@gmail.com
