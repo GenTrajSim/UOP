@@ -23,7 +23,7 @@
    #CLAS-> the special token for predicating the classifications of Local structures
    #for training for new elements, need change this part of in Uni_OP_train_v1.py and Uni-OP_v0.2_testing.py
    ```
-- dictionary of crystal types (can find in xx.pl)
+- dictionary of crystal types (can find in Train/Data_111/create_ice_dis2.pl)
   ```python
   dictionary = {'liquid':0,
                 'ice1c':5,
