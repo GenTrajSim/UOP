@@ -69,10 +69,10 @@
   if a local structure have more than 131 particles, need make some changes
 
   Parts of loss:
-  - token
-  - coord
-  - dist
-  - classification
+  - accuracy of predicated token
+  - predicated coord - standard coord
+  - predicated dist - standard dist
+  - accuracy of predicated classification (also can change this classifer to predicate a certain vale)
   ```python
   def loss_function_1(pred_token, orign_token, 
                     pred_crystal, real_crystal, 
