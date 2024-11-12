@@ -53,9 +53,17 @@
  
      in Train/Data_111/POSCAR_npy_displacement.py
 
-  4. Then, adding the Train_path in Train/Uni_OP_train_v1.py
+  4. Adding the Train_path in Train/Uni_OP_train_v1.py
      ```python
-     path_coord = 
+     path_coord = glob.glob('./Data_111/displacement/coord/*.npy')
+                + glob.glob('./Data_111/displacement2/coord/*.npy')
+                + glob.glob('./Data_111/displacement3/coord/*.npy')
+                + glob.glob('./Data_111/liq/coord/*.npy')
+                + glob.glob('./Data_111/displacement3/coord/*.npy')
+                + ...
      ```
+     Training new models
+  ### **Loss Function**
+  
 
 author email: liwenl.sim@gmail.com
