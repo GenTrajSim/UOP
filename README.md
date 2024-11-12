@@ -64,6 +64,9 @@
      ```
   5. Carrying out Train/Uni_OP_train_v1.py and Training new models
   ### **Loss Function**
+  the number “131” = "130" + "1". "130" represents the maximum number of particles contained in a Local structure. "1" represents the central atom.
+
+  if a local structure have more than 131 particles, need make some changes
   ```python
   def loss_function_1(pred_token, orign_token, 
                     pred_crystal, real_crystal, 
