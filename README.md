@@ -41,5 +41,5 @@
   ```
 
   ### **Training**
-  Traing dataset collected by 
+  Traing dataset (different ice crystals) created by [genice](https://github.com/vitroid/GenIce)
 author email: liwenl.sim@gmail.com
