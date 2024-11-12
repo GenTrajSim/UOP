@@ -13,7 +13,7 @@ for i in range(len(path)):
     pre_name = pre_name + '.POSCAR'
     print (filename, "=>" ,pre_name)
     pipeline = import_file(filename)
-    pipeline.modifiers.append(SelectTypeModifier(property = 'Particle Type', types = {1}))
+    pipeline.modifiers.append(SelectTypeModifier(property = 'Particle Type', types = {1})) ### if have virtual atoms modify -> types = {0,1}
     delete_modifier = DeleteSelectedModifier()
     pipeline.modifiers.append(delete_modifier)
     export_file(pipeline, pre_name, "vasp")
