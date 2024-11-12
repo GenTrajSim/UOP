@@ -2,3 +2,5 @@ tensorflow
 numpy
 scipy
 genice
+pymatgen
+ovito
