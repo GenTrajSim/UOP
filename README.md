@@ -62,7 +62,7 @@
                 + glob.glob('./Data_111/displacement3/coord/*.npy')
                 + ...
      ```
-     Training new models
+  5. Carrying out Train/Uni_OP_train_v1.py and Training new models
   ### **Loss Function**
   
 
