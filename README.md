@@ -64,6 +64,84 @@
      ```
   5. Carrying out Train/Uni_OP_train_v1.py and Training new models
   ### **Loss Function**
-  
+  ```python
+  def loss_function_1(pred_token, orign_token, 
+                    pred_crystal, real_crystal, 
+                    new_coord, real_coord, 
+                    new_dist, real_dist, 
+                    loss_x_norm, loss_delta_encoder_pair_rep_norm, 
+                    len_dictionary =4,
+                    masked_token_loss = 1.0, crysral_class_loss =1.0,
+                    masked_coord_loss = 1.0, masked_dist_loss =1.0,
+                    x_norm_loss =1.0, delta_pair_repr_norm_loss =1.0):
+    #mask_token = tf.cast(tf.not_equal(orign_token, 0), dtype=tf.int32)
+    mask_token = tf.cast(tf.where(tf.not_equal(orign_token, 0)&tf.not_equal(orign_token,3),1,0), dtype=tf.int32) #####   3->classify need change in different object
+    ##########!!!
+    pred_t_One = tf.math.argmax(tf.nn.log_softmax(pred_token, axis=-1),-1)
+    mask_tokenP= tf.cast(tf.where(tf.not_equal(pred_t_One , 0)&tf.not_equal(pred_t_One ,3),1,0), dtype=tf.int32) #####   3->classify need change in different object
+    ##########!!!
+    mask_token_classify = tf.cast(tf.not_equal(orign_token, 0), dtype=tf.int32)
+    #NO_padding_clas = tf.cast(tf.not_equal(orign_token, len_dictionary-1), dtype=tf.int32)
+    #mask_token = mask_token * NO_padding_clas
+    #sample_size = tf.reduce_sum(mask_token, axis = -1)  
+    orign_token = orign_token * mask_token_classify
+    #pred_token = pred_token*NO_padding_clas
+    token_loss = loss_object(orign_token,tf.nn.log_softmax(pred_token,axis=-1))
+    ####
+    crystal_loss = loss_object_cry(real_crystal, tf.nn.log_softmax(pred_crystal,axis=-1))
+    ##liquid_mask
+    crystal_mask_coord = tf.cast(tf.where(tf.not_equal(real_crystal,0),1,0),tf.float32) 
+    crystal_mask_coord2= tf.cast(tf.where(tf.not_equal(real_crystal,0),0,1),tf.float32) *0.000001 ## 0.0000001
+    crystal_mask_coord = tf.tile(tf.expand_dims(crystal_mask_coord,-1),multiples=[1,131])  ###check
+    crystal_mask_coord = tf.tile(tf.expand_dims(crystal_mask_coord,-1),multiples=[1,1,3])  ###check
+    crystal_mask_coord2= tf.tile(tf.expand_dims(crystal_mask_coord2,-1),multiples=[1,131])  ###check
+    crystal_mask_coord2= tf.tile(tf.expand_dims(crystal_mask_coord2,-1),multiples=[1,1,3])  ###check
+    crystal_mask_coord = crystal_mask_coord + crystal_mask_coord2
+    ####
+    crystal_mask_dist  = tf.cast(tf.where(tf.not_equal(real_crystal,0),1,0),tf.float32) 
+    crystal_mask_dist2 = tf.cast(tf.where(tf.not_equal(real_crystal,0),0,1),tf.float32) *0.000001 ## 0.0000001
+    crystal_mask_dist  = tf.tile(tf.expand_dims(crystal_mask_dist,-1),multiples=[1,131]) ###check
+    crystal_mask_dist  = tf.tile(tf.expand_dims(crystal_mask_dist,-1),multiples=[1,1,131]) ###check
+    crystal_mask_dist2 = tf.tile(tf.expand_dims(crystal_mask_dist2,-1),multiples=[1,131]) ###check
+    crystal_mask_dist2 = tf.tile(tf.expand_dims(crystal_mask_dist2,-1),multiples=[1,1,131]) ###check
+    crystal_mask_dist  = crystal_mask_dist + crystal_mask_dist2
+    #crystal_mask_dist  = tf.tile(tf.expand_dims(crystal_mask_dist, -1),multiples=[1,tf.shape(real_dist)[-3],1])
+    #crystal_mask_dist  = tf.tile(tf.expand_dims(crystal_mask_dist, -1),multiples=[1,1,tf.shape(real_dist)[-1],tf.shape(real_dist)[-1]])
+    ####
+    if new_coord is not None:
+        coord_loss = tf.compat.v1.losses.huber_loss(
+            labels = real_coord * crystal_mask_coord,
+            predictions = new_coord * crystal_mask_coord,
+            weights = tf.cast(tf.tile(tf.expand_dims(mask_tokenP,axis = -1), multiples=[1,1,3]), dtype=tf.float32),
+            delta = 0.01
+            #reduction=tf.keras.losses.Reduction.NONE
+        )
+    else:
+        coord_loss = 0
+    ###
+    if new_dist is not None:
+        dist_MASK = tf.tile(tf.expand_dims(mask_tokenP, axis=-1),
+                            multiples=[1,1,tf.shape(mask_tokenP)[-1]])
+        dist_MASK = dist_MASK * (tf.transpose(dist_MASK, perm=[0,2,1]))
+        ####whether add diagonal == 0
+        #dist_MASK = tf.linalg.set_diag(dist_MASK, tf.zeros([batch_size, 5], dtype=tf.float32))
+        dist_loss = tf.compat.v1.losses.huber_loss(
+            labels = real_dist * crystal_mask_dist,
+            predictions = new_dist  * crystal_mask_dist,
+            weights = tf.cast(dist_MASK, dtype=tf.float32),
+            delta = 0.01
+        )
+    if loss_x_norm is not None:
+        norm_loss = loss_x_norm
+    if loss_delta_encoder_pair_rep_norm is not None:
+        pair_loss = loss_delta_encoder_pair_rep_norm
+    loss = ((token_loss*masked_token_loss)+
+            (crystal_loss*crysral_class_loss)+
+            (coord_loss*masked_coord_loss)+
+            (dist_loss*masked_dist_loss)+
+            (norm_loss*x_norm_loss)+
+            (pair_loss*delta_pair_repr_norm_loss))
+    return loss, token_loss, crystal_loss, dist_loss, coord_loss
+  ```
 
 author email: liwenl.sim@gmail.com
