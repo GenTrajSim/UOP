@@ -67,6 +67,12 @@
   the number “131” = "130" + "1". "130" represents the maximum number of particles contained in a Local structure. "1" represents the central atom.
 
   if a local structure have more than 131 particles, need make some changes
+
+  Parts of loss:
+  - token
+  - coord
+  - dist
+  - classify
   ```python
   def loss_function_1(pred_token, orign_token, 
                     pred_crystal, real_crystal, 
