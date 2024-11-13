@@ -17,9 +17,16 @@
 |               └── Un-OP_*.txt #(output)
 |       └── checkpoint_COORD_1.00_vDAMN_ln_liq20/train/ #(replaceable)
 |           └── CHECKPOINT FILE #(replaceable)
-│   └──  MultiPT/train
-|        └── checkpoint file (model)
-└── Train
+│   └── MultiPT/
+|       ├── coord/ #(process documentation)
+|       ├── dist/ #(process documentation)
+|       ├── {1..i}.gro #(replaceable) for your systems
+|       └── {1..i}.POSCAR #(replaceable) for your systems
+└── Train/
+    ├── Data_111/
+    |   ├── displacement/coord
+    |   └── *pl *py #(create training data. save in displacement/coord)
+    └── Uni_OP_train_v1.py #(training main)
  ```
  - working sub_pathname: ${ca_filenmae}, dealing filenames: ${1..i}.gro and {1..i}.POSCAR
  - testing Data in SAVE/MultiPT/${ca_filenmae}/${1..i}.gro  AND  SAVE/MultiPT/${ca_filenmae}/${1..i}.POSCAR
