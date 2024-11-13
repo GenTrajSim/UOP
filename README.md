@@ -24,7 +24,7 @@
 |       └── {1..i}.POSCAR #(replaceable) for your systems
 └── Train/
     ├── Data_111/
-    |   ├── displacement/coord
+    |   ├── displacement/coord/*npy
     |   └── *pl *py #(create training data. save in displacement/coord)
     └── Uni_OP_train_v1.py #(training main)
  ```
