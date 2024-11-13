@@ -7,7 +7,7 @@
 │   ├── POSCAR_npy_displacement.py
 │   ├── Uni-OP_v0.2_testing.py
 │   ├── cont_test.pl
-│   └──  cont_test.sh
+│   └── cont_test.sh
 ├── SAVE/
 │   ├── 1.0_DAMN_liq20/
 │       ├── MultiPT/
