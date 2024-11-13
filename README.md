@@ -10,9 +10,16 @@
 │   └──  cont_test.sh
 ├── SAVE/
 │   ├── 1.0_DAMN_liq20/
-        ├──
-        ├── 
-│   └──  MultiPT/
+│       ├── MultiPT/
+│           └── only1/ #(**customizable**)
+|               ├── *pl *cpp #(Post-processing script)
+|               ├── {1..i}.lammpstrj #(output)
+|               └── Un-OP_*.txt #(output)
+|       └── checkpoint_COORD_1.00_vDAMN_ln_liq20/train/ #(replaceable)
+|           └── CHECKPOINT FILE #(replaceable)
+│   └──  MultiPT/train
+|        └── checkpoint file (model)
+└── Train
  ```
  - working sub_pathname: ${ca_filenmae}, dealing filenames: ${1..i}.gro and {1..i}.POSCAR
  - testing Data in SAVE/MultiPT/${ca_filenmae}/${1..i}.gro  AND  SAVE/MultiPT/${ca_filenmae}/${1..i}.POSCAR
