@@ -4,6 +4,13 @@
  ### **Using**   
  ```text
 ├── Uni-OP
+│   ├── POSCAR_npy_displacement.py
+│   ├── Uni-OP_v0.2_testing.py
+│   ├── cont_test.pl
+│   ├── cont_test.sh
+├── SAVE
+│   ├──
+│   ├──
  ```
  - working sub_pathname: ${ca_filenmae}, dealing filenames: ${1..i}.gro and {1..i}.POSCAR
  - testing Data in SAVE/MultiPT/${ca_filenmae}/${1..i}.gro  AND  SAVE/MultiPT/${ca_filenmae}/${1..i}.POSCAR
