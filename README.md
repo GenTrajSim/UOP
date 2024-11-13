@@ -2,6 +2,9 @@
 ![model](https://github.com/user-attachments/assets/6b09e08e-56d1-45e7-ae39-32fc9fa669fe)
 
  ### **Using**   
+ ```text
+├── Uni-OP
+ ```
  - working sub_pathname: ${ca_filenmae}, dealing filenames: ${1..i}.gro and {1..i}.POSCAR
  - testing Data in SAVE/MultiPT/${ca_filenmae}/${1..i}.gro  AND  SAVE/MultiPT/${ca_filenmae}/${1..i}.POSCAR
  - --> Uni-OP/cont_test.sh ## **submit** Example:
