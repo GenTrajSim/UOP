@@ -1,5 +1,6 @@
 # **UOP**: A universal Order Parameter Architecture for Crystallization
-![model](https://github.com/user-attachments/assets/6b09e08e-56d1-45e7-ae39-32fc9fa669fe)
+
+![modelfig](https://github.com/user-attachments/assets/4754cb09-5e62-43da-96cf-d8a7ee7a2e30)
 
  ### **Using**   
  - workflow
