@@ -90,7 +90,6 @@
                 + glob.glob('./Data_111/displacement2/coord/*.npy')
                 + glob.glob('./Data_111/displacement3/coord/*.npy')
                 + glob.glob('./Data_111/liq/coord/*.npy')
-                + glob.glob('./Data_111/displacement3/coord/*.npy')
                 + ...
      ```
   6. Carrying out Train/Uni_OP_train_v1.py and Training new models
