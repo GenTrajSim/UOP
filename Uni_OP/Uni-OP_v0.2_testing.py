@@ -789,7 +789,7 @@ class TransformerEncoderWithPair(tf.keras.layers.Layer):
         delta_pair_repr = tf.reshape(delta_pair_repr, (bsz, -1, seq_len, seq_len))
         delta_pair_repr = tf.transpose(delta_pair_repr, perm=[0,2,3,1])
         #)
-        #????nuclear funtion following#
+        #
         pair_mask = token_mask[..., None] * token_mask[..., None, :]
         #[bsz, seq_len, 1] * [bsz, 1, seq_len] -> shape [bsz, seq_len, seq_len]
         delta_pair_repr_norm = norm_loss(delta_pair_repr)
