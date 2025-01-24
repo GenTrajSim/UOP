@@ -23,7 +23,8 @@ dictionary = {'MASK':0, 'C':1, 'O':2, 'CLAS':3}
 
 #path_coord = glob.glob('./Data_111/displacement/coord/*.npy') + glob.glob('./Data_111/liq/coord/*.npy') + glob.glob('./Data_111/ice1h/coord/*.npy') + glob.glob('./Data_111/ice1c/coord/*.npy') 
 #path_coord = glob.glob('./Data_111/displacement2/coord/13*.npy') + glob.glob('./Data_111/displacement3/coord/13*.npy') # + glob.glob('./Data_111/liq/coord/*.npy')
-path_coord = glob.glob('./Data_111/displacement/coord/*.npy') + glob.glob('./Data_111/displacement2/coord/*.npy') + glob.glob('./Data_111/displacement3/coord/*.npy') + glob.glob('./Data_111/liq/coord/*.npy') + glob.glob('./Data_111/displacement3/coord/*.npy') #+ glob.glob('./Data_111/liq/coord/*.npy')
+path_coord = glob.glob('./Data_111/displacement/coord/*.npy') 
+#+ glob.glob('./Data_111/displacement2/coord/*.npy') + glob.glob('./Data_111/displacement3/coord/*.npy') + glob.glob('./Data_111/liq/coord/*.npy') + glob.glob('./Data_111/displacement3/coord/*.npy') #+ glob.glob('./Data_111/liq/coord/*.npy')
 #path_coord = glob.glob('./Data_111/displacement3/coord/*.npy')
 #+ glob.glob('./Data_111/MD/coord/*.npy') + glob.glob('./Data_111/ice1h/coord/*.npy') + glob.glob('./Data_111/ice1c/coord/*.npy') ###
 MAX_ATOM_N = 10000    ###MAXatom system cutoff
