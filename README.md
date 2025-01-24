@@ -14,8 +14,8 @@ Train/Uni_OP_train_v1.py
 SAVE/MultiPT/*.POSCAR
 SAVE/MultiPT/*.gro
 ```
-"*.gro" are the configuration files in Gromacs format. 
-The "*.POSCAR" files with the same name are configuration files whose corresponding configuration contains only O atoms.
+".gro" are the configuration files in Gromacs format. 
+The ".POSCAR" files with the same name are configuration files only containing O atoms.
 
 ![modelfig](https://github.com/user-attachments/assets/4754cb09-5e62-43da-96cf-d8a7ee7a2e30)
 
