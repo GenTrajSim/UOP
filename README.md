@@ -9,6 +9,11 @@ Train/Data_111/displacement/coord/*npy
 ```bash
 Train/Uni_OP_train_v1.py
 ```
+## A configuration to demo the classification ability of UOP:
+```bash
+SAVE/MultiPT/1.POSCAR
+SAVE/MultiPT/1.gro
+```
 
 ![modelfig](https://github.com/user-attachments/assets/4754cb09-5e62-43da-96cf-d8a7ee7a2e30)
 
