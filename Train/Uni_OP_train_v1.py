@@ -37,7 +37,8 @@ C = A(path_coord)
 path_coord = np.array(path_coord)
 path_coord = path_coord[C<=MAX_ATOM_N]
 
-path_test = glob.glob('./Test_Dataset/ice1h/coord/*.npy') + glob.glob('./Test_Dataset/ice1c/coord/*.npy') + glob.glob('./Test_Dataset/ice/coord/*.npy') + glob.glob('./Test_Dataset/hydrate/coord/*.npy') + glob.glob('./Data_111/liq/coord/*.npy')
+path_test = glob.glob('./Test_Dataset/ice1h/coord/*.npy') + glob.glob('./Test_Dataset/ice1c/coord/*.npy') 
+#+ glob.glob('./Test_Dataset/ice/coord/*.npy') + glob.glob('./Test_Dataset/hydrate/coord/*.npy') + glob.glob('./Data_111/liq/coord/*.npy')
 # + glob.glob('./Data_111/ice1h/coord/*.npy') + glob.glob('./Data_111/ice1c/coord/*.npy') 
 #path_test = glob.glob('./Data_111/displacement/coord/*.npy')
 #path_test = path_coord
