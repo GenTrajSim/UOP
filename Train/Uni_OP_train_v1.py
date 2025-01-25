@@ -1525,7 +1525,7 @@ for epoch in range(1000000):
                                                              ckpt_save_path))
 
         test_data_Freeder = Data_Feeder(
-                path_test, max_batch_system = 80 , max_atoms = 130,
+                path_test, max_batch_system = 2 , max_atoms = 130,
                 len_dictionary = len(dictionary), d_cut = 7# cut_off
                 #
                 , Training=False
