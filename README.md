@@ -2,11 +2,17 @@
 
 ## Environment requirements
 The following softwares/environments (versions) are required.
+
+The softwares (versions) are necessary in the "tensorflow" conda environment: 
 ```bash
 python == 3.11.0
 tensorflow == 2.4.0
 numpy == 1.26.3
 scipy == 1.12.0
+```
+The softwares (versions) are necessary in the "my_pymatgen" conda environment: 
+```bash
+numpy == 1.26.3
 pymatgen == 2024.6.10
 ```
 Operating system: Linux
