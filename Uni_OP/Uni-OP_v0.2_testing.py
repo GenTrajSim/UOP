@@ -12,7 +12,7 @@ from scipy.spatial.distance import pdist,squareform
 
 cal_filename = 'only1'
 cal_filename = sys.argv[1]
-cal_pathtest = '../SAVE/MultiPT/'+cal_filename+'/coord/*.npy'
+cal_pathtest = '../SAVE/MultiPT/coord/*.npy'
 
 physical_devices = tf.config.list_physical_devices('GPU')
 try:
