@@ -34,7 +34,7 @@ The ".gro" are the configuration files in Gromacs format.
 
 The ".POSCAR" files with the same name are the same configuration files (.gro) only containing O atoms.
 
-The file names (prefix) are integers from 1 to n. i.e., (1.gro 1.POSCAR)configuration-1, (2.gro 2.POSCAR)configuration-2, (3.gro 3.POSCAR)configuration-3 ...
+The file names (prefix) are integers from 1 to *n*. i.e., (1.gro 1.POSCAR)configuration-1, (2.gro 2.POSCAR)configuration-2, (3.gro 3.POSCAR)configuration-3 ...
 ## The code for predicting the types of local structures in the above configurations:
 ```bash
 Uni_OP/Uni-OP_v0.2_testing.py
@@ -53,7 +53,7 @@ In line 32 of "cont_test.sh", the working path is specified in "only1". You can 
 
 And the OUTPUT files are saved in "./SAVE/1.0_DAMN_liq20/MultiPT/only1/" or "./SAVE/1.0_DAMN_liq20/MultiPT/$ca_filenmae/"
 
-In line 35 of "cont_test.sh", {1..1}, this sets the total number of configurations to be processed. That is, it can be changed to "{1..n}".
+In line 35 of "cont_test.sh", {1..1}, this sets the total number of configurations to be processed. That is, it can be changed to "{1..*n*}".
 
 The system environment requires two conda subenvironments, namely tensorflow and my_pymatgen. 
 
