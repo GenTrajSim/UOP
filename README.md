@@ -32,6 +32,8 @@ The codes only need to satisfy the above environments and maintain the path form
 Train/Data_111/displacement/coord/*npy
 ```
 (different standard cystals)
+
+Due to the restricted storage capacity of GitHub, only a portion of the configuration data is uploaded here. In this path, you can add more configuration dataset that you want the UOP model to learn. 
 ## The training code of UOP : 
 ```bash
 Train/Uni_OP_train_v1.py
