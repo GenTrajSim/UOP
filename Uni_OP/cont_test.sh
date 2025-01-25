@@ -31,6 +31,8 @@ unset __conda_setup
 #	/home/liwenli/scratch/SAVE/MultiPT/P5000_T200
 ca_filenmae="only1"
 mkdir "../SAVE/1.0_DAMN_liq20/MultiPT/${ca_filenmae}"
+mkdir "../SAVE/MultiPT/dist"
+mkdir "../SAVE/MultiPT/coord"
 #ca_filenmae=$1
 ## 1..10
 for i in {1..1}
