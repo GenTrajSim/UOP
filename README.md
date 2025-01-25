@@ -33,7 +33,7 @@ In "cont_test.sh" line 32, The working path is specified in "only1". i.e. SAVE/M
 
 You can assign the ca_filenmae variable to the working pathname you want.
 
-And the OUTPUT file save in "../SAVE/1.0_DAMN_liq20/MultiPT/only1/"
+And the OUTPUT file save in "../SAVE/1.0_DAMN_liq20/MultiPT/only1/" or "../SAVE/1.0_DAMN_liq20/MultiPT/$ca_filenmae/"
 
 In "cont_test.sh" line 35 {1..1}, this sets the total number of configurations that need to be processed. i.e. can change to "{1..n}"
 
