@@ -1,6 +1,7 @@
 # **UOP**: A universal Order Parameter Architecture for Crystallization
 
 ## Environment requirements
+The following softwares/environments (version) are required.
 ```bash
 python == 3.11.0
 tensorflow == 2.4.0
