@@ -69,7 +69,8 @@ tensorflow: tensorflow-2.4.0; my_pymatgen: pymatgen 2024.6.10
 ## Expected OUTPUT
 
 The ouput files are stored in "./SAVE/1.0_DAMN_liq20/MultiPT/$ca_filenmae/".
-1.lammpstrj .. n.lammpstrj are the final input configuration files with UOP-classification information.
+
+i.e., 1.lammpstrj .. n.lammpstrj are the final input configuration files with UOP-classification information.
 ```bash
 ITEM: ATOMS id type xu yu zu ice17 ice1c ice1h ice2 ice3 ice4 ice5 ice6 ice7 ice20
 1 OW1 3.56 0.07 42.34 0 0.94 0 0 0 0 0 0 0 0
