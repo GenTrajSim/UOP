@@ -64,7 +64,11 @@ In line 35 of "cont_test.sh", {1..1}, this sets the total number of configuratio
 
 The system environment requires two conda subenvironments, namely tensorflow and my_pymatgen. 
 
-tensorflow: tensorflow-2.4.0; my_pymatgen: pymatgen 2024.6.10
+- tensorflow: tensorflow-2.4.0
+- my_pymatgen: pymatgen 2024.6.10
+If you need to utilize the newly trained model, the checkpoint files should be stored in the following path: ./SAVE/1.0_DAMN_liq20/checkpoint_COORD_1.00_vDAMN_ln_liq20/train
+The model trained in this project can be obtained from the following link:  
+[Uni-OP_457MB](https://www.dropbox.com/scl/fo/yvcfi23nokcg7u2j37aa0/AMkAqWznc35bRIxMIcHv88c?rlkey=a1isd575voytueqmw0vfttctw&st=94yb40tf&dl=0)
 
 ## Expected OUTPUT
 
