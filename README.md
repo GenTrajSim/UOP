@@ -33,7 +33,7 @@ In "cont_test.sh" line 32, The working path is specified in "only1". i.e. SAVE/M
 
 You can assign the ca_filenmae variable to the working pathname you want.
 
-And the OUTPUT file save in "../SAVE/1.0_DAMN_liq20/MultiPT/only1/Uni-OP.txt"
+And the OUTPUT file save in "../SAVE/1.0_DAMN_liq20/MultiPT/only1/"
 
 In "cont_test.sh" line 35 {1..1}, this sets the total number of configurations that need to be processed. i.e. can change to "{1..n}"
 
@@ -43,6 +43,13 @@ tensorflow: tensorflow-2.4.0; my_pymatgen: pymatgen 2024.6.10
 
 ## Expected OUTPUT
 
+The ouput files are stored in "../SAVE/1.0_DAMN_liq20/MultiPT/$ca_filenmae/".
+1.lammpstrj .. n.lammpstrj are the final input configuration files with UOP-classification information.
+```bash
+ITEM: ATOMS id type xu yu zu ice17 ice1c ice1h ice2 ice3 ice4 ice5 ice6 ice7 ice20
+1 OW1 3.56 0.07 42.34 0 0.94 0 0 0 0 0 0 0 0
+```
+The "ice17 ice1c ice1h ice2 ice3 ice4 ice5 ice6 ice7 ice20" labels are the corresponding crystal-like degree (CLD) of 10 crystals for each particle.
 
 ![modelfig](https://github.com/user-attachments/assets/4754cb09-5e62-43da-96cf-d8a7ee7a2e30)
 
