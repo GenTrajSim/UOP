@@ -51,7 +51,7 @@ The "cont_test.pl" and "cont_test.sh" are control programs for batch prediction 
 
 In line 32 of "cont_test.sh", the working path is specified in "only1". You can assign the ca_filenmae variable ($ca_filenmae) to the desired working pathname.
 
-And the OUTPUT files are saved in "../SAVE/1.0_DAMN_liq20/MultiPT/only1/" or "../SAVE/1.0_DAMN_liq20/MultiPT/$ca_filenmae/"
+And the OUTPUT files are saved in "./SAVE/1.0_DAMN_liq20/MultiPT/only1/" or "./SAVE/1.0_DAMN_liq20/MultiPT/$ca_filenmae/"
 
 In line 35 of "cont_test.sh", {1..1}, this sets the total number of configurations to be processed. That is, it can be changed to "{1..n}".
 
@@ -61,7 +61,7 @@ tensorflow: tensorflow-2.4.0; my_pymatgen: pymatgen 2024.6.10
 
 ## Expected OUTPUT
 
-The ouput files are stored in "../SAVE/1.0_DAMN_liq20/MultiPT/$ca_filenmae/".
+The ouput files are stored in "./SAVE/1.0_DAMN_liq20/MultiPT/$ca_filenmae/".
 1.lammpstrj .. n.lammpstrj are the final input configuration files with UOP-classification information.
 ```bash
 ITEM: ATOMS id type xu yu zu ice17 ice1c ice1h ice2 ice3 ice4 ice5 ice6 ice7 ice20
