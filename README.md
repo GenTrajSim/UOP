@@ -56,11 +56,11 @@ The "Uni-OP_v0.2_testing.py" is the main program of the prediction module.
 
 The "cont_test.pl" and "cont_test.sh" are control programs for batch prediction of configurations.
 
-In line 32 of "cont_test.sh", the working path is specified in "only1". You can assign the ca_filenmae variable ($ca_filenmae) to the desired working pathname.
+- In line 32 of "cont_test.sh", the working path is specified in "only1". You can assign the ca_filenmae variable ($ca_filenmae) to the desired working pathname.
 
 And the OUTPUT files are saved in "./SAVE/1.0_DAMN_liq20/MultiPT/only1/" or "./SAVE/1.0_DAMN_liq20/MultiPT/$ca_filenmae/"
 
-In line 35 of "cont_test.sh", {1..1}, this sets the total number of configurations to be processed. That is, it can be changed to "{1..*n*}".
+- In line 35 of "cont_test.sh", {1..1}, this sets the total number of configurations to be processed. That is, it can be changed to "{1..*n*}".
 
 The system environment requires two conda subenvironments, namely tensorflow and my_pymatgen. 
 
