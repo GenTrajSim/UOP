@@ -11,7 +11,7 @@ os.environ["OMP_NUM_THREADS"] = '1'
 
 cal_path = 'only1'
 cal_path = sys.argv[1]
-cal_path_poscar = '../SAVE/MultiPT/'+cal_path+'/56.panding.POSCAR'
+cal_path_poscar = '../SAVE/MultiPT/56.panding.POSCAR'
 #POSCAR_path = glob.glob('../SAVE/MultiPT/P5000_T200/56.panding.POSCAR')
 POSCAR_path = glob.glob(cal_path_poscar)
 element_map = {'C':0, 'O':1}
@@ -21,8 +21,8 @@ def write_POSCAR_npy(path,save_name):
     save_name = str(save_name)
     save_name = save_name.split('.POSCAR')[0]
     data = []
-    save_path_dist = '../SAVE/MultiPT/'+cal_path+'/dist/' + save_name + '.npy'
-    save_path_coord = '../SAVE/MultiPT/'+cal_path+'/coord/' + save_name + '.npy'
+    save_path_dist = '../SAVE/MultiPT/dist/' + save_name + '.npy'
+    save_path_coord = '../SAVE/MultiPT/coord/' + save_name + '.npy'
     print(path)
     print(save_path_coord)
     structure = Structure.from_file(path)
@@ -37,7 +37,7 @@ def write_POSCAR_npy(path,save_name):
 for i in range(len(POSCAR_path)):
     #label_type= (POSCAR_path[i]).split('R/')[-1].split('.')[0]
     #cryst_name = (POSCAR_path[i]).split('R/')[-1].split('.')[-2]
-    file_name_p = '../SAVE/MultiPT/'+cal_path+'/'
+    file_name_p = '../SAVE/MultiPT/'
     #file_name = (POSCAR_path[i]).split('../SAVE/MultiPT/P5000_T200/')[-1]
     file_name = (POSCAR_path[i]).split(file_name_p)[-1]
     write_POSCAR_npy(POSCAR_path[i],file_name)
