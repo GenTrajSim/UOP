@@ -17,6 +17,8 @@ SAVE/MultiPT/*.gro
 The ".gro" are the configuration files in Gromacs format. 
 
 The ".POSCAR" files with the same name are configuration files only containing O atoms.
+
+The file name are integers from 1 to n. i.e. 1.gro 1.POSCAR 2.gro 2.POSCAR ...
 ## the code of predicating the types of local stuctures in above configurations:
 ```bash
 Uni_OP/Uni-OP_v0.2_testing.py
@@ -26,6 +28,10 @@ Uni_OP/cont_test.sh
 The "Uni-OP_v0.2_testing.py" is the main program of the prediction module.
 
 THe "cont_test.pl" and "cont_test.sh" are control programs that predict configurations in batches.
+
+In "cont_test.sh" line 32, The working path is specified in "only1". i.e. SAVE/MultiPT/only1/.
+
+In "cont_test.sh" line 35 {1..1}, this sets the total number of configurations that need to be processed. i.e. can change to "{1..n}"
 
 ![modelfig](https://github.com/user-attachments/assets/4754cb09-5e62-43da-96cf-d8a7ee7a2e30)
 
