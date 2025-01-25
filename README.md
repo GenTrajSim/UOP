@@ -1,7 +1,7 @@
 # **UOP**: A universal Order Parameter Architecture for Crystallization
 
 ## Environment requirements
-The following softwares/environments (version) are required.
+The following softwares/environments (versions) are required.
 ```bash
 python == 3.11.0
 tensorflow == 2.4.0
@@ -9,6 +9,7 @@ numpy == 1.26.3
 scipy == 1.12.0
 pymatgen == 2024.6.10
 ```
+## Installation guide: N/A
 ## A small dataset to demo the code of Training UOP: 
 ```bash
 Train/Data_111/displacement/coord/*npy
@@ -17,6 +18,10 @@ Train/Data_111/displacement/coord/*npy
 ## The code of training UOP: 
 ```bash
 Train/Uni_OP_train_v1.py
+```
+Execute the command:
+```bash
+python Uni_OP_train_v1.py
 ```
 ## A configuration to demo the classification ability of UOP:
 ```bash
@@ -33,6 +38,10 @@ The file name are integers from 1 to n. i.e. 1.gro 1.POSCAR 2.gro 2.POSCAR ...
 Uni_OP/Uni-OP_v0.2_testing.py
 Uni_OP/cont_test.pl
 Uni_OP/cont_test.sh
+```
+Execute the command:
+```bash
+sh cont_test.sh
 ```
 The "Uni-OP_v0.2_testing.py" is the main program of the prediction module.
 
