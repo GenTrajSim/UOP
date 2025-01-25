@@ -7,6 +7,7 @@ The following softwares/environments (versions) are required.
 conda or miniconda environment
 ```
 minicoda installation guide: https://docs.anaconda.com/miniconda/install/
+
 The softwares (versions) are necessary in the "tensorflow" conda environment: 
 ```bash
 python == 3.11.0
@@ -15,6 +16,7 @@ numpy == 1.26.3
 scipy == 1.12.0
 ```
 tensorflow installation guide: https://www.tensorflow.org/install
+
 The softwares (versions) are necessary in the "my_pymatgen" conda environment: 
 ```bash
 numpy == 1.26.3
