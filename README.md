@@ -1,7 +1,13 @@
 # **UOP**: A universal Order Parameter Architecture for Crystallization
 
 ## Environment requirements
-
+```bash
+python == 3.11.0
+tensorflow == 2.4.0
+numpy == 1.26.3
+scipy == 1.12.0
+pymatgen == 2024.6.10
+```
 ## A small dataset to demo the code of Training UOP: 
 ```bash
 Train/Data_111/displacement/coord/*npy
