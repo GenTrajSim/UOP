@@ -10,7 +10,7 @@ conda or miniconda environment
 The softwares (versions) are necessary in the "tensorflow" conda environment: 
 ```bash
 python == 3.11.0
-tensorflow == 2.4.0
+tensorflow-gpu == 2.4.0
 numpy == 1.26.3
 scipy == 1.12.0
 ```
