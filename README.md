@@ -10,6 +10,7 @@ scipy == 1.12.0
 pymatgen == 2024.6.10
 ```
 ## Installation guide: N/A
+The codes only need to satisfy the above environments and maintain the path format in github in order to run. 
 ## A small dataset to demo the code of Training UOP: 
 ```bash
 Train/Data_111/displacement/coord/*npy
