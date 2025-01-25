@@ -6,7 +6,7 @@ The following softwares/environments (versions) are required.
 ```bash
 conda or miniconda environment
 ```
-
+minicoda installation guide: https://docs.anaconda.com/miniconda/install/
 The softwares (versions) are necessary in the "tensorflow" conda environment: 
 ```bash
 python == 3.11.0
@@ -14,11 +14,13 @@ tensorflow-gpu == 2.4.0
 numpy == 1.26.3
 scipy == 1.12.0
 ```
+tensorflow installation guide: https://www.tensorflow.org/install
 The softwares (versions) are necessary in the "my_pymatgen" conda environment: 
 ```bash
 numpy == 1.26.3
 pymatgen == 2024.6.10
 ```
+pymatgen installation guide: https://pymatgen.org/installation.html
 Operating system: Linux
 ## Installation guide: N/A
 The codes only need to satisfy the above environments and maintain the path format in github in order to run. 
