@@ -9,6 +9,7 @@ numpy == 1.26.3
 scipy == 1.12.0
 pymatgen == 2024.6.10
 ```
+operating systems: Linux
 ## Installation guide: N/A
 The codes only need to satisfy the above environments and maintain the path format in github in order to run. 
 ## A small dataset to demo the code of Training UOP: 
