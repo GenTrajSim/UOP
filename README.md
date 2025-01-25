@@ -33,7 +33,7 @@ Train/Uni_OP_train_v1.py
 ```
 Execute the command:
 ```bash
-python Uni_OP_train_v1.py
+python3 Uni_OP_train_v1.py
 ```
 ## A configuration for demonstrating the classification ability of UOP:
 The configurations that need to be processed are stored in the following path. And a configuration requires two files in different formats (gro and POSCAR).
@@ -179,7 +179,7 @@ The "ice17 ice1c ice1h ice2 ice3 ice4 ice5 ice6 ice7 ice20" labels are the corre
 
      Execute the command:
      ```bash
-     python ovitos_gro_poscar_d.py
+     python3 ovitos_gro_poscar_d.py
      ```
   5. POSCAR -> coord/*.npy by using [pymatgen](https://pymatgen.org/)
  
@@ -187,7 +187,7 @@ The "ice17 ice1c ice1h ice2 ice3 ice4 ice5 ice6 ice7 ice20" labels are the corre
      
      Execute the command:
      ```bash
-     python POSCAR_npy_displacement.py
+     python3 POSCAR_npy_displacement.py
      ```
 
   7. Adding the Train_path in Train/Uni_OP_train_v1.py
@@ -201,7 +201,7 @@ The "ice17 ice1c ice1h ice2 ice3 ice4 ice5 ice6 ice7 ice20" labels are the corre
   8. Carrying out Train/Uni_OP_train_v1.py and Training new models
      Execute the command:
      ```bash
-     python Uni_OP_train_v1.py
+     python3 Uni_OP_train_v1.py
      ```
   ### **Loss Function**
   the number “131” = "130" + "1". "130" represents the maximum number of particles contained in a Local structure. "1" represents the central atom.
