@@ -92,12 +92,14 @@ The "ice17 ice1c ice1h ice2 ice3 ice4 ice5 ice6 ice7 ice20" labels are the corre
 ├── SAVE/
 │   ├── 1.0_DAMN_liq20/
 │       ├── MultiPT/
-│           └── only1/ #(**customizable**)
-|               ├── *pl *cpp #(Post-processing script)
+│           ├── only1/ #(**customizable**)
+|               ├── *pl *cpp #(Post-processing script, copy from "../program/")
 |               ├── {1..i}.lammpstrj #(output)
 |               └── Un-OP_*.txt #(output)
+|           └── program/
+|               └── *pl *cpp #(Post-processing scripts)
 |       └── checkpoint_COORD_1.00_vDAMN_ln_liq20/train/ #(replaceable)
-|           └── CHECKPOINT FILE #(replaceable)
+|           └── MODEL CHECKPOINT FILE #(replaceable)
 │   └── MultiPT/
 |       ├── coord/ #(process documentation)
 |       ├── dist/ #(process documentation)
