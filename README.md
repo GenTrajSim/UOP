@@ -34,7 +34,7 @@ The ".gro" are the configuration files in Gromacs format.
 
 The ".POSCAR" files with the same name are the same configuration files (.gro) only containing O atoms.
 
-The file name are integers from 1 to n. i.e. (1.gro 1.POSCAR)configuration-1, (2.gro 2.POSCAR)configuration-2, (3.gro 3.POSCAR)configuration-3 ...
+The file names (prefix) are integers from 1 to n. i.e., (1.gro 1.POSCAR)configuration-1, (2.gro 2.POSCAR)configuration-2, (3.gro 3.POSCAR)configuration-3 ...
 ## The code of predicating the types of local stuctures in above configurations:
 ```bash
 Uni_OP/Uni-OP_v0.2_testing.py
