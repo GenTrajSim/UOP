@@ -69,7 +69,7 @@ And the OUTPUT files are saved in "./SAVE/1.0_DAMN_liq20/MultiPT/only1/" or "./S
 
 The system environment requires two conda subenvironments, namely tensorflow and my_pymatgen. 
 
-- tensorflow: tensorflow-2.4.0
+- tensorflow: tensorflow-gpu 2.4.0
 - my_pymatgen: pymatgen 2024.6.10
   
 If you need to utilize the newly trained model, the checkpoint files should be stored in the following path: **./SAVE/1.0_DAMN_liq20/checkpoint_COORD_1.00_vDAMN_ln_liq20/train**
