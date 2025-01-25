@@ -3,6 +3,10 @@
 ## Environment requirements
 The following softwares/environments (versions) are required.
 
+```bash
+conda or miniconda environment
+```
+
 The softwares (versions) are necessary in the "tensorflow" conda environment: 
 ```bash
 python == 3.11.0
