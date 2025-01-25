@@ -12,12 +12,12 @@ pymatgen == 2024.6.10
 Operating systems: Linux
 ## Installation guide: N/A
 The codes only need to satisfy the above environments and maintain the path format in github in order to run. 
-## A small dataset to demo the code of Training UOP: 
+## A small dataset is used to demonstrate the code of Training UOP: 
 ```bash
 Train/Data_111/displacement/coord/*npy
 ```
 (different standard cystals)
-## The code of training UOP: 
+## The training code of UOP : 
 ```bash
 Train/Uni_OP_train_v1.py
 ```
@@ -25,7 +25,7 @@ Execute the command:
 ```bash
 python Uni_OP_train_v1.py
 ```
-## A configuration to demo the classification ability of UOP:
+## A configuration for demonstrating the classification ability of UOP: :
 ```bash
 SAVE/MultiPT/*.POSCAR
 SAVE/MultiPT/*.gro
