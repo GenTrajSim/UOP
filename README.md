@@ -50,7 +50,7 @@ Uni_OP/cont_test.sh
 ```
 Execute the command:
 ```bash
-sh cont_test.sh
+sbatch cont_test.sh
 ```
 The "Uni-OP_v0.2_testing.py" is the main program of the prediction module.
 
