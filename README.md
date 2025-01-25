@@ -21,7 +21,8 @@ numpy == 1.26.3
 pymatgen == 2024.6.10
 ```
 pymatgen installation guide: https://pymatgen.org/installation.html
-Operating system: Linux
+
+- Operating system: Linux
 ## Installation guide: N/A
 The codes only need to satisfy the above environments and maintain the path format in github in order to run. 
 ## A small dataset is used to demonstrate the code of Training UOP: 
