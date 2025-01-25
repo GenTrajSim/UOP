@@ -65,6 +65,7 @@ The "cont_test.pl" and "cont_test.sh" are control programs for batch prediction 
 And the OUTPUT files are saved in "./SAVE/1.0_DAMN_liq20/MultiPT/only1/" or "./SAVE/1.0_DAMN_liq20/MultiPT/$ca_filenmae/"
 
 - In line 35 of "cont_test.sh", {1..1}, this sets the total number of configurations to be processed. That is, it can be changed to "{1..*n*}".
+- In line 12-25 of "cont_test.sh", initialize the coda environment, which can be set according to your environment.
 
 The system environment requires two conda subenvironments, namely tensorflow and my_pymatgen. 
 
