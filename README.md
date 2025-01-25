@@ -25,7 +25,8 @@ Execute the command:
 ```bash
 python Uni_OP_train_v1.py
 ```
-## A configuration for demonstrating the classification ability of UOP: :
+## A configuration for demonstrating the classification ability of UOP:
+The configurations that need to be processed are stored in the following path. And A configuration requires two files in different formats (gro and POSCAR).
 ```bash
 SAVE/MultiPT/*.POSCAR
 SAVE/MultiPT/*.gro
