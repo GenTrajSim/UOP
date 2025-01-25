@@ -158,15 +158,29 @@ The "ice17 ice1c ice1h ice2 ice3 ice4 ice5 ice6 ice7 ice20" labels are the corre
 
      Only standard crystals are required.
      
+     Execute the command:
+     ```bash
+     perl create_ice_dis2.pl
+     ```
+     
   3. delete Hydrogen and virtual atoms, and create the POSCAR file
 
      by using [ovito](https://www.ovito.org/docs/current/python/) (in Train/Data_111/ovitos_gro_poscar_d.py)
-     
-  4. POSCAR -> coord/*.npy by using [pymatgen](https://pymatgen.org/)
+
+     Execute the command:
+     ```bash
+     python ovitos_gro_poscar_d.py
+     ```
+  5. POSCAR -> coord/*.npy by using [pymatgen](https://pymatgen.org/)
  
      in Train/Data_111/POSCAR_npy_displacement.py
+     
+     Execute the command:
+     ```bash
+     python POSCAR_npy_displacement.py
+     ```
 
-  5. Adding the Train_path in Train/Uni_OP_train_v1.py
+  7. Adding the Train_path in Train/Uni_OP_train_v1.py
      ```python
      path_coord = glob.glob('./Data_111/displacement/coord/*.npy')
                 + glob.glob('./Data_111/displacement2/coord/*.npy')
@@ -174,7 +188,11 @@ The "ice17 ice1c ice1h ice2 ice3 ice4 ice5 ice6 ice7 ice20" labels are the corre
                 + glob.glob('./Data_111/liq/coord/*.npy')
                 + ...
      ```
-  6. Carrying out Train/Uni_OP_train_v1.py and Training new models
+  8. Carrying out Train/Uni_OP_train_v1.py and Training new models
+     Execute the command:
+     ```bash
+     python Uni_OP_train_v1.py
+     ```
   ### **Loss Function**
   the number “131” = "130" + "1". "130" represents the maximum number of particles contained in a Local structure. "1" represents the central atom.
 
