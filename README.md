@@ -29,7 +29,9 @@ The "Uni-OP_v0.2_testing.py" is the main program of the prediction module.
 
 THe "cont_test.pl" and "cont_test.sh" are control programs that predict configurations in batches.
 
-In "cont_test.sh" line 32, The working path is specified in "only1". i.e. SAVE/MultiPT/only1/.
+In "cont_test.sh" line 32, The working path is specified in "only1". i.e. SAVE/MultiPT/only1/. 
+
+And the OUTPUT file save in "../SAVE/1.0_DAMN_liq20/MultiPT/only1/Uni-OP.txt"
 
 In "cont_test.sh" line 35 {1..1}, this sets the total number of configurations that need to be processed. i.e. can change to "{1..n}"
 
