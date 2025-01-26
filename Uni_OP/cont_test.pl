@@ -114,7 +114,7 @@ close OU13;
 close OU14;
 close OU20;
 ##
-system("cp ../SAVE/MultiPT/$cal_filename/56.panding.gro ../SAVE/1.0_DAMN_liq20/MultiPT/$cal_filename/panding.gro");
+system("cp ../SAVE/MultiPT/56.panding.gro ../SAVE/1.0_DAMN_liq20/MultiPT/$cal_filename/panding.gro");
 system("cd ../SAVE/1.0_DAMN_liq20/MultiPT/$cal_filename/. && ./cj");
 system("cd ../SAVE/1.0_DAMN_liq20/MultiPT/$cal_filename/. && perl op_p.pl");
 ##
