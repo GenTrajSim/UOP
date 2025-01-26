@@ -10,7 +10,7 @@ AUTO = tf.data.experimental.AUTOTUNE
 from scipy.spatial.distance import pdist,squareform
 #tf.set_printoptions(threshold=tf.inf)
 log_save_path = "log_COORD_1.00_vDAMN_ln_liq20"
-if not os.path.exists(folder_path):
+if not os.path.exists(log_save_path):
     os.makedirs(log_save_path)
 
 physical_devices = tf.config.list_physical_devices('GPU')
