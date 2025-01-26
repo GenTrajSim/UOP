@@ -141,14 +141,14 @@ The "ice17 ice1c ice1h ice2 ice3 ice4 ice5 ice6 ice7 ice20" labels are the corre
  ### **Origin model:**
  [Uni-OP_457MB](https://www.dropbox.com/scl/fo/yvcfi23nokcg7u2j37aa0/AMkAqWznc35bRIxMIcHv88c?rlkey=a1isd575voytueqmw0vfttctw&st=94yb40tf&dl=0)
  - Pull this model in SAVE/1.0_DAMN_liq20/checkpoint_COORD_1.00_vDAMN_ln_liq20/train
- - this model only train the 10 kinds of ice crystals and liquid at different P-T conditions
- - this only have 4 kinds of tokens (elements)
+ - this model only trains the 10 kinds of ice crystals and liquid at different P-T conditions
+ - this only has 4 kinds of tokens (elements)
    in Uni_OP_train_v1.py and Uni-OP_v0.2_testing.py
    ```python
    dictionary = {'MASK':0, 'C':1, 'O':2, 'CLAS':3}
    #Mask-> adding noises for masking elements;
    #CLAS-> the special token for predicating the classifications of Local structures
-   #for training for new elements, need change this part of in Uni_OP_train_v1.py and Uni-OP_v0.2_testing.py
+   #For training new elements, this part needs to be changed in Uni_OP_train_v1.py and Uni-OP_v0.2_testing.py
    ```
 - dictionary of crystal types (can find in Train/Data_111/create_ice_dis2.pl)
   ```python
@@ -164,7 +164,7 @@ The "ice17 ice1c ice1h ice2 ice3 ice4 ice5 ice6 ice7 ice20" labels are the corre
                 'ice0':17,
                 'ice12':20}
   ## This model has a total of 31 categories, but only 11 of them are trained and can be supplemented.
-  ## If you go beyond 31 categories, you need to further modify the code.
+  ## If you exceed 31 categories, it is necessary for you to further modify the code. 
   ```
 - More data can be added to train the Uni-OP, making it adaptable to more systems
 
