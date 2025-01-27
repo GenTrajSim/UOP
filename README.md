@@ -27,6 +27,21 @@ pymatgen installation guide: https://pymatgen.org/installation.html
 - Operating system: Linux
 ## Installation guide: N/A
 The codes only need to satisfy the above environments and maintain the path format in github in order to run. 
+- UOP's environment setup command:
+- ```bash
+  conda create -n tensorflow python==3.11 ### Note: Please do not change the environment name.
+  conda activate tensorflow
+  pip install scipy==1.12
+  conda install numpy==1.26
+  pip install tensorflow-gpu==2.14 ###or 2.4.0
+  conda deactivate
+  conda create -n my_pymatgen python==3.11 ## Note: Please do not change the environment name.
+  conda activate my_pymatgen
+  conda install numpy==1.26
+  pip install pymatgen==2024.6.10
+  conda deactivate
+  ```
+
 ## A small dataset is used to demonstrate the code of Training UOP: 
 ```bash
 Train/Data_111/displacement/coord/*npy
