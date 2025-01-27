@@ -109,8 +109,8 @@ ITEM: ATOMS id type xu yu zu ice17 ice1c ice1h ice2 ice3 ice4 ice5 ice6 ice7 ice
 ```
 The "ice17 ice1c ice1h ice2 ice3 ice4 ice5 ice6 ice7 ice20" labels are the corresponding crystal-like degree (CLD) of 10 crystals for each particle.
 
-## NV4090/v100/A100 test 
-## The computing efficiency of UOP under the CPU version of TensorFlow is ~108 token/s (local structures/s) with ~160 cores.  
+## NV4090/v100/A100/cpu test 
+- The computing efficiency of UOP under the CPU version of TensorFlow is ~108 token/s (local structures/s) with ~160 cores.  
 
 ![modelfig](https://github.com/user-attachments/assets/4754cb09-5e62-43da-96cf-d8a7ee7a2e30)
 
