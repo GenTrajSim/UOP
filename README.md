@@ -180,7 +180,9 @@ The "ice17 ice1c ice1h ice2 ice3 ice4 ice5 ice6 ice7 ice20" labels are the corre
                 'ice0':17,
                 'ice12':20}
   ## This model has a total of 31 categories, but only 11 of them are trained and can be supplemented.
-  ## If you exceed 31 categories, it is necessary for you to further modify the code. 
+  ## If you exceed 31 categories, it is necessary for you to further modify the code.
+  ## The naming template for the new type of crystal should adhere to the pattern of "2.xxxcystalxxx.npy" or "3.xxxcystalxxx.npy"...
+  ## The prefix represents the dictionary id of the crystal type.
   ```
 - More data can be added to train the Uni-OP, making it adaptable to more systems
 
