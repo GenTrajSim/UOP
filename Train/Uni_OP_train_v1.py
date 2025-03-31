@@ -15,8 +15,8 @@ if not os.path.exists(log_save_path):
 
 physical_devices = tf.config.list_physical_devices('GPU')
 try:
-    tf.config.experimental.set_visible_devices(physical_dievices[0],'GPU')
-    tf.config.experimental.set_memory_growth(physical_dievices[0], True)
+    tf.config.experimental.set_visible_devices(physical_devices[0],'GPU')
+    tf.config.experimental.set_memory_growth(physical_devices[0], True)
 except:
     # Invalid device or cannot modify virtual devices once initialized.
     pass
