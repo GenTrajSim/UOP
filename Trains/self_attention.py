@@ -42,8 +42,7 @@ class SelfMultiHeadAttention(tf.keras.layers.Layer):
              key,            #shape (bsz, seq_len, embed_dim)
              value,           #shape (bsz, seq_len, embed_dim)
              key_padding_mask, #shape (bsz, seq_len)
-             attn_bias,       #shape (bsz * (num_head-1), Natom, Natom) ps. Natom == seq_len
-             embeding_bias,   #shape (bsz, seq_len, seq_len)
+             attn_bias,       #shape (bsz * num_head, Natom, Natom) ps. Natom == seq_len
              training = False,
              return_attn=True):
         bsz = tf.shape(query)[0]
@@ -83,9 +82,6 @@ class SelfMultiHeadAttention(tf.keras.layers.Layer):
             tgt_len == src_len
             check_bias_shape!!!!!!!!!!!'''
         if attn_bias is not None:
-            if embeding_bias is not None:
-                attn_bias = tf.reshape(attn_bias, (bsz, self.num_heads - 1, tgt_len, src_len))
-                attn_bias = tf.concat([attn_bias, embeding_bias], axis=1)
             attn_bias = tf.reshape(attn_bias, (bsz*self.num_heads, tgt_len, src_len)) #!!check shape
             attn_weights += attn_bias
         attn = self.softmax1(attn_weights)
@@ -113,3 +109,6 @@ class SelfMultiHeadAttention(tf.keras.layers.Layer):
         #output = tf.reshape(output,(batch_size, -1, self.d_model))
         #output = self.dense(output)
         #return output, attention_weights
+'''
+ Herein, need to check the shapes of key_padding_mask and attn_bias !!!!!!!
+'''
