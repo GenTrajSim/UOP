@@ -72,15 +72,13 @@ class MaskLMHead(tf.keras.layers.Layer):
         #x = self.weight(x) + self.bias
         return x
 
-  class ClassificationHead(tf.keras.layers.Layer):
-    def __init__(
-        self, 
-        input_dim, 
-        inner_dim, 
-        num_classes, 
-        #activation_fn, 
-        pooler_dropout
-    ):
+class ClassificationHead(tf.keras.layers.Layer):
+    def __init__(self, 
+            input_dim, 
+            inner_dim, 
+            num_classes, 
+            #activation_fn, 
+            pooler_dropout):
         super(ClassificationHead, self).__init__()
         self.dense = tf.keras.layers.Dense(inner_dim)
         #self.activation_fn = tf.keras.activations.tanh() #### need check
