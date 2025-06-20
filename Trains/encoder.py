@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
-import self_attention
+import self_attention as sat
 
 class TransformerEncoderLayer(tf.keras.layers.Layer):
     def __init__(self, 
@@ -27,7 +27,7 @@ class TransformerEncoderLayer(tf.keras.layers.Layer):
         
         self.activation_fn = tf.keras.layers.Activation('gelu')
         
-        self.self_attn = SelfMultiHeadAttention(
+        self.self_attn = sat.SelfMultiHeadAttention(
             self.embed_dim,
             attention_heads,
             dropout = attention_dropout
