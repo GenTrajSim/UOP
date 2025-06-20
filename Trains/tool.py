@@ -139,7 +139,7 @@ class DistanceHead(tf.keras.layers.Layer):
         return x
 
 class embeding_PT_iter_P0ro1(tf.keras.layers.Layer):
-    def __init__(self, Total_T, hiddeP, hiddeT, hidde1, hidde2, NATOMS, CorP=2):
+    def __init__(self, Total_T, NATOMS, hiddeP=16, hiddeT=16, hidde1=16, hidde2=16, CorP=2):
         super(embeding_PT_iter_P0ro1, self).__init__()
         self.embed_T = tf.keras.layers.Embedding(Total_T, hidde1)
         self.embed_C = tf.keras.layers.Embedding(CorP, hidde2)
