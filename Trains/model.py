@@ -171,6 +171,7 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
                 logits_h,  ##crystal type
                 encoder_distance,
                 encoder_coord,
+                coord_update,
                 x_norm,
                 delta_encoder_pair_rep_norm
                 )
