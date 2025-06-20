@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
-import self_attention_plus_embeding
+import self_attention
 
 class TransformerEncoderLayer(tf.keras.layers.Layer):
     def __init__(self, 
