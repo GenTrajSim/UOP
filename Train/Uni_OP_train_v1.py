@@ -1059,7 +1059,7 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
             attn_probs = self.pair2coord_proj(delta_encoder_pair_rep)
             coord_update = delta_pos / atom_num * attn_probs
             coord_update = tf.reduce_sum(coord_update, axis=2)
-            encoder_coord = coords_emb + coord_update
+            encoder_coord = coords_emb + coord_update   ###### coord_update noise output
         if self.masked_dist_loss > 0:
             encoder_distance = self.dist_head(encoder_pair_rep)
         if Not_only_features:
