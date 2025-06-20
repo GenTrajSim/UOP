@@ -158,5 +158,5 @@ class embeding_PT_iter_P0ro1(tf.keras.layers.Layer):
         embeding = tf.concat([embeding, denseT], axis=-1)
         embeding = self.denseall(embeding)
         embeding = self.activation_fn(embeding)
-        embeding = tf.reshape(embeding, (-1, 1, self.NATOMS, self.NATOMS))
+        embeding = tf.reshape(embeding, (-1, self.NATOMS, self.NATOMS, 1))
         return embeding
