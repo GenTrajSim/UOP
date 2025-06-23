@@ -204,7 +204,7 @@ y = test_layer(token,
                encoder_masked_tokens=None,   # always None
                Not_only_features=True)
 '''
-dictionary = {'MASK':0, 'C':1, 'O':2, 'N':3, 'CLAS':4} 
+dictionary = {'MASK':0, 'C':1, 'O':2, 'N':3, 'CLAS':4, 'TEMP':5, 'PRESS':6} 
 test_layer = Gen3Dmol_Classify(
         encoder_layers = 3,
         encoder_embed_dim = 512,
