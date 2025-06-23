@@ -204,3 +204,55 @@ y = test_layer(token,
                encoder_masked_tokens=None,   # always None
                Not_only_features=True)
 '''
+dictionary = {'MASK':0, 'C':1, 'O':2, 'N':3, 'CLAS':4} 
+test_layer = Gen3Dmol_Classify(
+        encoder_layers = 3,
+        encoder_embed_dim = 512,
+        encoder_ffn_embed_dim = 512,
+        encoder_attention_heads = 8,
+        Natom = 5,
+        iterT = 1000,
+        dropout = 0.1,
+        emb_dropout = 0.1,
+        attention_dropout = 0.1,
+        activation_dropout = 0.0,
+        pooler_dropout = 0.0,
+        max_seq_len = 5,
+        #activation_fn = "rel
+        #pooler_activation_fn = "tanh",
+        post_ln = False,
+        masked_token_loss = 1.0,
+        masked_token_pred = 1.0,
+        masked_coord_loss = 1.0,
+        masked_dist_loss = 1.0,
+        x_norm_loss = 1.0,
+        delta_pair_repr_norm_loss = 1.0,
+        num_classes = 6,
+        crytal_class = len(dictionary),
+        dictionary = dictionary
+        )
+
+token = tf.constant([[4,1,1,2,1],[4,2,3,0,0]])
+tf.print(token.shape)
+tf.print(token)
+#NO_padding_mask = tf.cast(tf.not_equal(token, 0), dtype=tf.int32)
+#NO_padding_clas = tf.cast(tf.not_equal(token, len(dictionary)-1), dtype=tf.int32)
+#NO_padding = NO_padding_mask * NO_padding_clas
+#tf.print(NO_padding)
+#weight_token = tf.cast((tf.random.uniform(shape=NO_padding.shape))*(len(dictionary)-2)+1, dtype=tf.int32) 
+#tf.print(weight_token*NO_padding)
+#tf.print(tf.where(tf.not_equal( weight_token*NO_padding ,0), NO_padding , token))
+
+edge = (tf.reshape(token,[-1,token.shape[-1],1])*len(dictionary)) + tf.reshape(token,[-1,1,token.shape[-1]])
+tf.print(edge.shape)
+tf.print(edge)
+coord = tf.constant([[[0,0,0],[1.2,0.4,3],[3.1,4.3,0.4],[5.0,0.3,1.1],[3,3,0]], [[0,0,0],[0.2,0.3,4],[1,1,1],[3,0,1],[0.4,1,4]]])
+tf.print(coord.shape)
+tf.print(coord)
+diff = tf.expand_dims(coord, axis=2) - tf.expand_dims(coord, axis=1)  # [N, N, D]
+dist_matrix = tf.sqrt(tf.reduce_sum(tf.square(diff), axis=-1))  # [N, N]
+tf.print(dist_matrix.shape)
+tf.print(dist_matrix)
+
+out=test_layer(token,dist_matrix,coord,edge,20.2,100.3,10,1)
+tf.print(out.shape)
