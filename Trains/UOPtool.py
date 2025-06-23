@@ -95,6 +95,52 @@ class ClassificationHead(tf.keras.layers.Layer):
         x = self.out_proj(x)
         return x
 
+class TemperatureHead(tf.keras.layers.Layer):
+    def __init__(self,
+            input_dim,
+            inner_dim,
+            out_dim,
+            #activation_fn,
+            pooler_dropout):
+        super(ClassificationHead, self).__init__()
+        self.dense = tf.keras.layers.Dense(inner_dim)
+        #self.activation_fn = tf.keras.activations.tanh() #### need check
+        self.activation_fn = tf.keras.layers.Activation('gelu')
+        self.dropout = tf.keras.layers.Dropout(pooler_dropout)
+        self.out_proj = tf.keras.layers.Dense(out_dim)
+    def call (self, features):
+        x = features[:, 1, :]
+        x = self.dropout(x)
+        x = self.dense(x)
+        #x = tf.keras.activations.tanh(x)
+        x = self.activation_fn(x)
+        x = self.dropout(x)
+        x = self.out_proj(x)
+        return x
+
+class PressureHead(tf.keras.layers.Layer):
+    def __init__(self,
+            input_dim,
+            inner_dim,
+            out_dim,
+            #activation_fn,
+            pooler_dropout):
+        super(ClassificationHead, self).__init__()
+        self.dense = tf.keras.layers.Dense(inner_dim)
+        #self.activation_fn = tf.keras.activations.tanh() #### need check
+        self.activation_fn = tf.keras.layers.Activation('gelu')
+        self.dropout = tf.keras.layers.Dropout(pooler_dropout)
+        self.out_proj = tf.keras.layers.Dense(out_dim)
+    def call (self, features):
+        x = features[:, 2, :]
+        x = self.dropout(x)
+        x = self.dense(x)
+        #x = tf.keras.activations.tanh(x)
+        x = self.activation_fn(x)
+        x = self.dropout(x)
+        x = self.out_proj(x)
+        return x
+
 class NonLinearHead(tf.keras.layers.Layer):
     def __init__(
         self, 
@@ -137,23 +183,23 @@ class DistanceHead(tf.keras.layers.Layer):
         return x
 
 class embeding_PT_iter_P0ro1(tf.keras.layers.Layer):
-    def __init__(self, Total_T, NATOMS, hiddeP=16, hiddeT=16, hidde1=16, hidde2=16, CorP=2):
+    def __init__(self, Total_T, NATOMS, hidde1=16, hidde2=16, CorP=2):
         super(embeding_PT_iter_P0ro1, self).__init__()
         self.embed_T = tf.keras.layers.Embedding(Total_T, hidde1)
         self.embed_C = tf.keras.layers.Embedding(CorP, hidde2)
-        self.dense_P = tf.keras.layers.Dense(hiddeP)
-        self.dense_T = tf.keras.layers.Dense(hiddeT)
+        #self.dense_P = tf.keras.layers.Dense(hiddeP)
+        #self.dense_T = tf.keras.layers.Dense(hiddeT)
         self.NATOMS = NATOMS
         self.denseall= tf.keras.layers.Dense(self.NATOMS*self.NATOMS)
         self.activation_fn =  tf.keras.layers.Activation('gelu')
-    def call (self, press, temp, iter_T, Predict01):
+    def call (self, iter_T, Predict01):
         embedingT = self.embed_T(iter_T)
         embedingC = self.embed_C(Predict01)
-        denseP = self.dense_P(press)
-        denseT = self.dense_T(temp)
+        #denseP = self.dense_P(press)
+        #denseT = self.dense_T(temp)
         embeding = tf.concat([embedingT, embedingC], axis=-1)
-        embeding = tf.concat([embeding, denseP], axis=-1)
-        embeding = tf.concat([embeding, denseT], axis=-1)
+        #embeding = tf.concat([embeding, denseP], axis=-1)
+        #embeding = tf.concat([embeding, denseT], axis=-1)
         embeding = self.denseall(embeding)
         embeding = self.activation_fn(embeding)
         embeding = tf.reshape(embeding, (-1, self.NATOMS, self.NATOMS, 1))
