@@ -90,7 +90,7 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
             K+1, self.encoder_attention_heads
         )
         self.gbf = uopt.GaussianLayer(K, n_edge_type)
-        self.ebb = uopt.embeding_PT_iter_P0ro1(self.iterT, self.Natom) #######################################################
+        self.ebb = uopt.Embeding_PT_iter_P0ro1(self.iterT, self.Natom) #######################################################
         if self.masked_coord_loss > 0:
             self.pair2coord_proj  = uopt.NonLinearHead(
                 self.encoder_attention_heads, 1
@@ -104,6 +104,8 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
                                                        num_classes = self.num_classes, 
                                                        #activation_fn, 
                                                        pooler_dropout = self.pooler_dropout)
+        self.temperatureHead = uopt.TemperatureHead(input_dim=self.encoder_embed_dim,inner_dim = self.encoder_embed_dim,out_dim=1,pooler_dropout = self.pooler_dropout)
+        self.pressureHead = uopt.PressureHead(input_dim=self.encoder_embed_dim,inner_dim = self.encoder_embed_dim,out_dim=1,pooler_dropout = self.pooler_dropout)
     # classmmethod
     # def build_model(cls, args, task): 
     # return cls(args, task.dictionary)
@@ -113,9 +115,10 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
         src_distance,
         src_coord,
         src_edge_type,
-        press, temp, iter_T, Predict01,
+        iter_T, Predict01,
         encoder_masked_tokens=None,   # always None
-        Not_only_features=False,
+        Not_only_features=True,
+        PT_predict = True,
         training = False
         #classification_head_name=True
     ):
@@ -125,7 +128,7 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
         #if not tf.reduce_any(padding_mask):
         #    padding_mask = None
         x = self.embed_tokens(src_tokens)
-        embedding_bias = self.ebb(press, temp, iter_T, Predict01) ######################################################
+        embedding_bias = self.ebb(iter_T, Predict01) ######################################################
         def get_dist_features(dist, et):
             n_node = dist.shape[-1]
             gbf_feature = self.gbf(dist, et)
@@ -153,10 +156,10 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
         if self.masked_coord_loss > 0:
             coords_emb = src_coord
             if padding_mask is not None:
-                atom_num = tf.reshape((tf.reduce_sum( 1 - tf.cast(padding_mask, x.dtype) , axis=1) -1),
+                atom_num = tf.reshape((tf.reduce_sum( 1 - tf.cast(padding_mask, x.dtype) , axis=1) -3), ###need check origin: "-1"
                                       (-1, 1, 1, 1))
             else:
-                atom_num = tf.shape(src_coord, 1) - 1 ###?????check!!!!!!!!!!!!!!!!!!!!!!!!!!!!(-1)?????
+                atom_num = tf.shape(src_coord, 1) - 3 ###?????check!!!!!!!!!!!!!!!!!!!!!! #need check origin: (-1)
             delta_pos = tf.expand_dims(coords_emb, axis=1) - tf.expand_dims(coords_emb, axis=2)
             attn_probs = self.pair2coord_proj(delta_encoder_pair_rep)
             coord_update = delta_pos / atom_num * attn_probs
@@ -166,9 +169,14 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
             encoder_distance = self.dist_head(encoder_pair_rep)
         if Not_only_features:
             logits_h = self.classification_heads(encoder_rep)
+        if PT_predict:
+            temp = self.temperatureHead(encoder_rep)
+            press = self.pressureHead(encoder_rep)
             return (
                 logits,   ###token type
                 logits_h,  ##crystal type
+                temp,
+                press,
                 encoder_distance,
                 encoder_coord,
                 coord_update,
@@ -204,13 +212,13 @@ y = test_layer(token,
                encoder_masked_tokens=None,   # always None
                Not_only_features=True)
 '''
-dictionary = {'MASK':0, 'C':1, 'O':2, 'N':3, 'CLAS':4, 'TEMP':5, 'PRESS':6} 
+dictionary = {'MASK':0, 'C':1, 'O':2, 'N':3, 'H':4, 'CLAS':5, 'TEMP':6, 'PRESS':7} 
 test_layer = Gen3Dmol_Classify(
         encoder_layers = 3,
         encoder_embed_dim = 512,
         encoder_ffn_embed_dim = 512,
         encoder_attention_heads = 8,
-        Natom = 5,
+        Natom = 5+2,
         iterT = 1000,
         dropout = 0.1,
         emb_dropout = 0.1,
@@ -232,7 +240,7 @@ test_layer = Gen3Dmol_Classify(
         dictionary = dictionary
         )
 
-token = tf.constant([[4,1,1,2,1],[4,2,3,0,0]])
+token = tf.constant([[4,5,6,1,1,2,1],[4,5,6,2,3,0,0]])
 tf.print(token.shape)
 tf.print(token)
 #NO_padding_mask = tf.cast(tf.not_equal(token, 0), dtype=tf.int32)
@@ -246,13 +254,35 @@ tf.print(token)
 edge = (tf.reshape(token,[-1,token.shape[-1],1])*len(dictionary)) + tf.reshape(token,[-1,1,token.shape[-1]])
 tf.print(edge.shape)
 tf.print(edge)
-coord = tf.constant([[[0,0,0],[1.2,0.4,3],[3.1,4.3,0.4],[5.0,0.3,1.1],[3,3,0]], [[0,0,0],[0.2,0.3,4],[1,1,1],[3,0,1],[0.4,1,4]]])
+coord = tf.constant([[[0,0,0],[0,0,0],[0,0,0],[1.2,0.4,3],[3.1,4.3,0.4],[5.0,0.3,1.1],[3,3,0]], [[0,0,0],[0,0,0],[0,0,0],[0.2,0.3,4],[1,1,1],[3,0,1],[0.4,1,4]]])
 tf.print(coord.shape)
 tf.print(coord)
 diff = tf.expand_dims(coord, axis=2) - tf.expand_dims(coord, axis=1)  # [N, N, D]
 dist_matrix = tf.sqrt(tf.reduce_sum(tf.square(diff), axis=-1))  # [N, N]
 tf.print(dist_matrix.shape)
 tf.print(dist_matrix)
+iter_i = tf.random.uniform(shape=(token.shape[0],),minval=0,maxval=1000,dtype=tf.int32)
+PorC = tf.random.uniform(shape=(token.shape[0],),minval=0,maxval=2,dtype=tf.int32)
 
-out=test_layer(token,dist_matrix,coord,edge,20.2,100.3,10,1)
-tf.print(out.shape)
+out=test_layer(token,dist_matrix,coord,edge,iter_i,PorC)
+#tf.print(out.shape)
+(
+        logits,   ###token type
+        logits_h,  ##crystal type
+        temp,
+        press,
+        encoder_distance,
+        encoder_coord,
+        coord_update,
+        x_norm,
+        delta_encoder_pair_rep_norm
+)=out
+tf.print(logits.shape)
+tf.print(logits_h.shape)
+tf.print(temp.shape)
+tf.print(press.shape)
+tf.print(encoder_distance.shape)
+tf.print(encoder_coord.shape)
+tf.print(coord_update.shape)
+tf.print(x_norm.shape)
+tf.print(delta_encoder_pair_rep_norm.shape)
