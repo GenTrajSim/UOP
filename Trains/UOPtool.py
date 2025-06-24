@@ -102,7 +102,7 @@ class TemperatureHead(tf.keras.layers.Layer):
             out_dim,
             #activation_fn,
             pooler_dropout):
-        super(ClassificationHead, self).__init__()
+        super(TemperatureHead, self).__init__()
         self.dense = tf.keras.layers.Dense(inner_dim)
         #self.activation_fn = tf.keras.activations.tanh() #### need check
         self.activation_fn = tf.keras.layers.Activation('gelu')
@@ -125,7 +125,7 @@ class PressureHead(tf.keras.layers.Layer):
             out_dim,
             #activation_fn,
             pooler_dropout):
-        super(ClassificationHead, self).__init__()
+        super(PressureHead, self).__init__()
         self.dense = tf.keras.layers.Dense(inner_dim)
         #self.activation_fn = tf.keras.activations.tanh() #### need check
         self.activation_fn = tf.keras.layers.Activation('gelu')
@@ -182,9 +182,9 @@ class DistanceHead(tf.keras.layers.Layer):
         x = ( x + tf.transpose(x, perm=[0, 2, 1]) ) * 0.5
         return x
 
-class embeding_PT_iter_P0ro1(tf.keras.layers.Layer):
+class Embeding_PT_iter_P0ro1(tf.keras.layers.Layer):
     def __init__(self, Total_T, NATOMS, hidde1=16, hidde2=16, CorP=2):
-        super(embeding_PT_iter_P0ro1, self).__init__()
+        super(Embeding_PT_iter_P0ro1, self).__init__()
         self.embed_T = tf.keras.layers.Embedding(Total_T, hidde1)
         self.embed_C = tf.keras.layers.Embedding(CorP, hidde2)
         #self.dense_P = tf.keras.layers.Dense(hiddeP)
