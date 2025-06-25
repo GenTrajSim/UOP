@@ -57,6 +57,7 @@ class XYZ_reader:
         self.coords = np.array(self.coords)
         self.elements = np.array(self.elements)
         self.elements_ids = np.array([self.dictionary[e1] for e1 in self.elements], dtype=int)
+        self.Natom = self.elements.shape[0]
     def get_cell(self):
         return self.cell
 
@@ -75,19 +76,64 @@ class XYZ_reader:
     def get_elements_ids(self):
         return self.elements_ids
 
-    def get_local_env(self, max_neighbor=50, cutoff=10.0):
+    def get_local_env(self, max_neighbor=50, cutoff=5):
         local_token = []
         local_coord = []
+        local_token = np.full((self.Natom,max_neighbor+4,1),self.dictionary['MASK'],dtype=int)
+        local_token[:,0,0] = 5
+        local_token[:,1,0] = 6
+        local_token[:,2,0] = 7
+        local_coord = np.zeros((self.Natom,max_neighbor+4,3),dtype=float)
+        #local_coord[:,0:4,:] = 0
+        idx_i,idx_j,offsets = neighbor_list('ijS',self.ase_atoms,cutoff)
+        neighbor_dict = {i: [] for i in range(self.Natom)}
+        for i,j,S in zip(idx_i,idx_j,offsets):
+            neighbor_pos = self.coords[j] + np.dot(S,self.cell)
+            rel_pos = neighbor_pos - self.coords[i]
+            neighbor_dict[i].append((j,rel_pos))
+        for i in range(self.Natom):
+            neighors = sorted(neighbor_dict[i], key=lambda x: np.linalg.norm(x[1]))
+            local_token[i,3,0] = self.elements_ids[i]
+            for k, (j, rel_pos) in enumerate(neighors[:max_neighbor]):
+                local_token[i,k+4,0] = self.elements_ids[j]
+                local_coord[i,k+4,:]=rel_pos
+        return local_token, local_coord
 
 
 parser = XYZ_reader(test_path)
 print("Natoms:", parser.get_num_atoms())
 print("cell:", parser.get_cell().shape)
 #print("ATOMS:\n", parser.get_ase_atom())
-print("ele:\n",parser.get_elements_ids().shape)
+print("ele:\n",parser.get_elements_ids()[0])
 print("coord:\n", parser.get_coords().shape)
+local_elem, local_coords = parser.get_local_env(50,10)
+local_elem = np.array(local_elem)
+local_coords=np.array(local_coords)
+print(local_elem.shape)
+print(local_coords.shape)
+#idx_i,idx_j,offsets = neighbor_list('ijS',parser.get_ase_atom(),10)
+#print("idx_i:\n",idx_i.shape)
+#print("idx_j:\n",idx_j.shape)
+#print("offsets:\n",offsets.shape)
+#neighbor_dict = {i: [] for i in range(parser.get_num_atoms())}
+#for i,j,S in zip(idx_i,idx_j,offsets):
+#    test_neighbor_pos = parser.get_coords()[j] + np.dot(S,parser.get_cell())
+#    rel_pos = test_neighbor_pos - parser.get_coords()[i]
+#    neighbor_dict[i].append((j,rel_pos))
+#    print(rel_pos)
+#neighbor_dict = np.array(neighbor_dict)
+def get_shape(lst):
+    shape = []
+    while isinstance(lst, list):
+        shape.append(len(lst))
+        if len(lst) == 0:
+            break
+        lst = lst[0]
+    return tuple(shape)
 
-idx_i,idx_j,offsets = neighbor_list('ijS',parser.get_ase_atom(),10)
-print("idx_i:\n",idx_i)
-print("idx_j:\n",idx_j)
-print("offsets:\n",offsets)
+#lst3 = [[[1], [2]], [[3], [4]]]
+#print(get_shape(lst3))  # 输出 (2, 2, 1)
+
+#print(get_shape(neighbor_dict[0]))
+
+
