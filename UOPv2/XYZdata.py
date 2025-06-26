@@ -1,15 +1,9 @@
-import random
 import numpy as np
-import glob
-import os
-import sys
 import re
-#from scipy.spatial.distance import pdist,squareform
 from ase import Atoms
-from ase.geometry import geometry
 from ase.neighborlist import neighbor_list
 
-test_path = "./Data/test/model.xyz"
+#test_path = "./Data/test/model.xyz"
 
 #data_test = np.loadtxt(test_path)
 #print(data_test)
@@ -76,7 +70,7 @@ class XYZ_reader:
     def get_elements_ids(self):
         return self.elements_ids
 
-    def get_local_env(self, max_neighbor=50, cutoff=5):
+    def get_local_env(self, max_neighbor=80, cutoff=5):
         local_token = []
         local_coord = []
         local_token = np.full((self.Natom,max_neighbor+4,1),self.dictionary['MASK'],dtype=int)
@@ -97,20 +91,22 @@ class XYZ_reader:
             for k, (j, rel_pos) in enumerate(neighors[:max_neighbor]):
                 local_token[i,k+4,0] = self.elements_ids[j]
                 local_coord[i,k+4,:]=rel_pos
-        return local_token, local_coord
+        return (local_token.astype(np.int32), 
+                local_coord.astype(np.float32))
 
-
-parser = XYZ_reader(test_path)
-print("Natoms:", parser.get_num_atoms())
-print("cell:", parser.get_cell().shape)
-#print("ATOMS:\n", parser.get_ase_atom())
-print("ele:\n",parser.get_elements_ids()[0])
-print("coord:\n", parser.get_coords().shape)
-local_elem, local_coords = parser.get_local_env(50,10)
-local_elem = np.array(local_elem)
-local_coords=np.array(local_coords)
-print(local_elem.shape)
-print(local_coords.shape)
+if __name__ == "__main__":
+    test_path = "./Data/test/model.xyz"
+    parser = XYZ_reader(test_path)
+    print("Natoms:", parser.get_num_atoms())
+    print("cell:", parser.get_cell().shape)
+    #print("ATOMS:\n", parser.get_ase_atom())
+    print("ele:\n",parser.get_elements_ids()[0])
+    print("coord:\n", parser.get_coords().shape)
+    local_elem, local_coords = parser.get_local_env(80,10)
+    local_elem = np.array(local_elem)
+    local_coords=np.array(local_coords)
+    print(local_elem.shape)
+    print(local_coords.shape)
 #idx_i,idx_j,offsets = neighbor_list('ijS',parser.get_ase_atom(),10)
 #print("idx_i:\n",idx_i.shape)
 #print("idx_j:\n",idx_j.shape)
@@ -122,18 +118,34 @@ print(local_coords.shape)
 #    neighbor_dict[i].append((j,rel_pos))
 #    print(rel_pos)
 #neighbor_dict = np.array(neighbor_dict)
-def get_shape(lst):
-    shape = []
-    while isinstance(lst, list):
-        shape.append(len(lst))
-        if len(lst) == 0:
-            break
-        lst = lst[0]
-    return tuple(shape)
-
+#def get_shape(lst):
+#    shape = []
+#    while isinstance(lst, list):
+#        shape.append(len(lst))
+#        if len(lst) == 0:
+#            break
+#        lst = lst[0]
+#    return tuple(shape)
+#
 #lst3 = [[[1], [2]], [[3], [4]]]
 #print(get_shape(lst3))  # 输出 (2, 2, 1)
 
 #print(get_shape(neighbor_dict[0]))
 
-
+#class Data_Feeder:
+#    def __init__(self, total_path, each_system_batch=2, max_neighbor=80, cutoff = 5, Traning = False):
+#        self.total_path = total_path
+#        self.each_system_batch = each_system_batch
+#        self.max_neighbor = max_neighbor
+#        self.cutoff = cutoff
+#        self.dictionary = {'MASK':0, 'C':1, 'O':2, 'N':3, 'H':4, 'CLAS':5, 'TEMP':6, 'PRESS':7}
+#        #self.crystal = {'liquid':0, 'P'}
+#        self.Traning = Traning
+#    
+#    def read_lable(self,filename):
+#        filename = str(filename)
+#        label = int(filename.split('/')[-1].split('.')[0])
+#        temp  = float(filename.split('/')[-1].split('.')[1])
+#        press = float(filename.split('/')[-1].split('.')[2])
+#        time  = int(filename.split('/')[-1].split('.')[3])
+#

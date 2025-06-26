@@ -1,9 +1,9 @@
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
-import self_attention as sat
-import encoder 
-import UOPtool as uopt
+#import self_attention as sat
+from .encoder import TransformerEncoderWithPair
+from .UOPtool import MaskLMHead,NonLinearHead,GaussianLayer,ClassificationHead,TemperatureHead,PressureHead,DistanceHead,Embeding_PT_iter_P0ro1
 
 class Gen3Dmol_Classify(tf.keras.layers.Layer):
     def __init__(
@@ -64,7 +64,7 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
         self.embed_tokens = tf.keras.layers.Embedding(
             len(dictionary), self.encoder_embed_dim, mask_zero=True
         )
-        self.encoder = encoder.TransformerEncoderWithPair(
+        self.encoder = TransformerEncoderWithPair(
             encoder_layers = self.encoder_layers, 
             embed_dim = self.encoder_embed_dim, 
             ffn_embed_dim = self.encoder_ffn_embed_dim, 
@@ -79,33 +79,33 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
             no_final_head_layer_norm = self.delta_pair_repr_norm_loss
         )
         if self.masked_token_loss > 0:
-            self.lm_head = uopt.MaskLMHead(
+            self.lm_head = MaskLMHead(
                 embed_dim = self.encoder_embed_dim,
                 output_dim = self.crytal_class,
                 weight=None
             )
         K = 128
         n_edge_type = len(dictionary) * len(dictionary)
-        self.gbf_proj = uopt.NonLinearHead(
+        self.gbf_proj = NonLinearHead(
             K+1, self.encoder_attention_heads
         )
-        self.gbf = uopt.GaussianLayer(K, n_edge_type)
-        self.ebb = uopt.Embeding_PT_iter_P0ro1(self.iterT, self.Natom) #######################################################
+        self.gbf = GaussianLayer(K, n_edge_type)
+        self.ebb = Embeding_PT_iter_P0ro1(self.iterT, self.Natom) #######################################################
         if self.masked_coord_loss > 0:
-            self.pair2coord_proj  = uopt.NonLinearHead(
+            self.pair2coord_proj  = NonLinearHead(
                 self.encoder_attention_heads, 1
             )
         if self.masked_dist_loss > 0:
-            self.dist_head = uopt.DistanceHead(
+            self.dist_head = DistanceHead(
                 self.encoder_attention_heads
             )
-        self.classification_heads = uopt.ClassificationHead(input_dim = self.encoder_embed_dim,
+        self.classification_heads = ClassificationHead(input_dim = self.encoder_embed_dim,
                                                        inner_dim = self.encoder_embed_dim,
                                                        num_classes = self.num_classes, 
                                                        #activation_fn, 
                                                        pooler_dropout = self.pooler_dropout)
-        self.temperatureHead = uopt.TemperatureHead(input_dim=self.encoder_embed_dim,inner_dim = self.encoder_embed_dim,out_dim=1,pooler_dropout = self.pooler_dropout)
-        self.pressureHead = uopt.PressureHead(input_dim=self.encoder_embed_dim,inner_dim = self.encoder_embed_dim,out_dim=1,pooler_dropout = self.pooler_dropout)
+        self.temperatureHead = TemperatureHead(input_dim=self.encoder_embed_dim,inner_dim = self.encoder_embed_dim,out_dim=1,pooler_dropout = self.pooler_dropout)
+        self.pressureHead = PressureHead(input_dim=self.encoder_embed_dim,inner_dim = self.encoder_embed_dim,out_dim=1,pooler_dropout = self.pooler_dropout)
     # classmmethod
     # def build_model(cls, args, task): 
     # return cls(args, task.dictionary)
@@ -212,77 +212,77 @@ y = test_layer(token,
                encoder_masked_tokens=None,   # always None
                Not_only_features=True)
 '''
-dictionary = {'MASK':0, 'C':1, 'O':2, 'N':3, 'H':4, 'CLAS':5, 'TEMP':6, 'PRESS':7} 
-test_layer = Gen3Dmol_Classify(
-        encoder_layers = 3,
-        encoder_embed_dim = 512,
-        encoder_ffn_embed_dim = 512,
-        encoder_attention_heads = 8,
-        Natom = 5+2,
-        iterT = 1000,
-        dropout = 0.1,
-        emb_dropout = 0.1,
-        attention_dropout = 0.1,
-        activation_dropout = 0.0,
-        pooler_dropout = 0.0,
-        max_seq_len = 5,
-        #activation_fn = "rel
-        #pooler_activation_fn = "tanh",
-        post_ln = False,
-        masked_token_loss = 1.0,
-        masked_token_pred = 1.0,
-        masked_coord_loss = 1.0,
-        masked_dist_loss = 1.0,
-        x_norm_loss = 1.0,
-        delta_pair_repr_norm_loss = 1.0,
-        num_classes = 6,
-        crytal_class = len(dictionary),
-        dictionary = dictionary
-        )
 
-token = tf.constant([[4,5,6,1,1,2,1],[4,5,6,2,3,0,0]])
-tf.print(token.shape)
-tf.print(token)
-#NO_padding_mask = tf.cast(tf.not_equal(token, 0), dtype=tf.int32)
-#NO_padding_clas = tf.cast(tf.not_equal(token, len(dictionary)-1), dtype=tf.int32)
-#NO_padding = NO_padding_mask * NO_padding_clas
-#tf.print(NO_padding)
-#weight_token = tf.cast((tf.random.uniform(shape=NO_padding.shape))*(len(dictionary)-2)+1, dtype=tf.int32) 
-#tf.print(weight_token*NO_padding)
-#tf.print(tf.where(tf.not_equal( weight_token*NO_padding ,0), NO_padding , token))
-
-edge = (tf.reshape(token,[-1,token.shape[-1],1])*len(dictionary)) + tf.reshape(token,[-1,1,token.shape[-1]])
-tf.print(edge.shape)
-tf.print(edge)
-coord = tf.constant([[[0,0,0],[0,0,0],[0,0,0],[1.2,0.4,3],[3.1,4.3,0.4],[5.0,0.3,1.1],[3,3,0]], [[0,0,0],[0,0,0],[0,0,0],[0.2,0.3,4],[1,1,1],[3,0,1],[0.4,1,4]]])
-tf.print(coord.shape)
-tf.print(coord)
-diff = tf.expand_dims(coord, axis=2) - tf.expand_dims(coord, axis=1)  # [N, N, D]
-dist_matrix = tf.sqrt(tf.reduce_sum(tf.square(diff), axis=-1))  # [N, N]
-tf.print(dist_matrix.shape)
-tf.print(dist_matrix)
-iter_i = tf.random.uniform(shape=(token.shape[0],),minval=0,maxval=1000,dtype=tf.int32)
-PorC = tf.random.uniform(shape=(token.shape[0],),minval=0,maxval=2,dtype=tf.int32)
-
-out=test_layer(token,dist_matrix,coord,edge,iter_i,PorC)
-#tf.print(out.shape)
-(
-        logits,   ###token type
-        logits_h,  ##crystal type
-        temp,
-        press,
-        encoder_distance,
-        encoder_coord,
-        coord_update,
-        x_norm,
-        delta_encoder_pair_rep_norm
-)=out
-tf.print(logits.shape)
-tf.print(logits_h.shape)
-tf.print(temp.shape)
-tf.print(press.shape)
-tf.print(encoder_distance.shape)
-tf.print(encoder_coord.shape)
-tf.print(coord_update.shape)
-tf.print(x_norm.shape)
-tf.print(delta_encoder_pair_rep_norm.shape)
+if __name__ == "__main__":
+    
+    dictionary = {'MASK':0, 'C':1, 'O':2, 'N':3, 'H':4, 'CLAS':5, 'TEMP':6, 'PRESS':7} 
+    test_layer = Gen3Dmol_Classify(
+            encoder_layers = 3,
+            encoder_embed_dim = 512,
+            encoder_ffn_embed_dim = 512,
+            encoder_attention_heads = 8,
+            Natom = 5+2,
+            iterT = 1000,
+            dropout = 0.1,
+            emb_dropout = 0.1,
+            attention_dropout = 0.1,
+            activation_dropout = 0.0,
+            pooler_dropout = 0.0,
+            max_seq_len = 5,
+            #activation_fn = "rel
+            #pooler_activation_fn = "tanh",
+            post_ln = False,
+            masked_token_loss = 1.0,
+            masked_token_pred = 1.0,
+            masked_coord_loss = 1.0,
+            masked_dist_loss = 1.0,
+            x_norm_loss = 1.0,
+            delta_pair_repr_norm_loss = 1.0,
+            num_classes = 6,
+            crytal_class = len(dictionary),
+            dictionary = dictionary
+            )
+    token = tf.constant([[4,5,6,1,1,2,1],[4,5,6,2,3,0,0]])
+    tf.print(token.shape)
+    tf.print(token)
+    #NO_padding_mask = tf.cast(tf.not_equal(token, 0), dtype=tf.int32)
+    #NO_padding_clas = tf.cast(tf.not_equal(token, len(dictionary)-1), dtype=tf.int32)
+    #NO_padding = NO_padding_mask * NO_padding_clas
+    #tf.print(NO_padding)
+    #weight_token = tf.cast((tf.random.uniform(shape=NO_padding.shape))*(len(dictionary)-2)+1, dtype=tf.int32) 
+    #tf.print(weight_token*NO_padding)
+    #tf.print(tf.where(tf.not_equal( weight_token*NO_padding ,0), NO_padding , token))
+    edge = (tf.reshape(token,[-1,token.shape[-1],1])*len(dictionary)) + tf.reshape(token,[-1,1,token.shape[-1]])
+    tf.print(edge.shape)
+    tf.print(edge)
+    coord = tf.constant([[[0,0,0],[0,0,0],[0,0,0],[1.2,0.4,3],[3.1,4.3,0.4],[5.0,0.3,1.1],[3,3,0]], [[0,0,0],[0,0,0],[0,0,0],[0.2,0.3,4],[1,1,1],[3,0,1],[0.4,1,4]]])
+    tf.print(coord.shape)
+    tf.print(coord)
+    diff = tf.expand_dims(coord, axis=2) - tf.expand_dims(coord, axis=1)  # [N, N, D]
+    dist_matrix = tf.sqrt(tf.reduce_sum(tf.square(diff), axis=-1))  # [N, N]
+    tf.print(dist_matrix.shape)
+    tf.print(dist_matrix)
+    iter_i = tf.random.uniform(shape=(token.shape[0],),minval=0,maxval=1000,dtype=tf.int32)
+    PorC = tf.random.uniform(shape=(token.shape[0],),minval=0,maxval=2,dtype=tf.int32)
+    out=test_layer(token,dist_matrix,coord,edge,iter_i,PorC)
+    #tf.print(out.shape)
+    (
+            logits,   ###token type
+            logits_h,  ##crystal type
+            temp,
+            press,
+            encoder_distance,
+            encoder_coord,
+            coord_update,
+            x_norm,
+            delta_encoder_pair_rep_norm
+            )=out
+    tf.print(logits.shape)
+    tf.print(logits_h.shape)
+    tf.print(temp.shape)
+    tf.print(press.shape)
+    tf.print(encoder_distance.shape)
+    tf.print(encoder_coord.shape)
+    tf.print(coord_update.shape)
+    tf.print(x_norm.shape)
+    tf.print(delta_encoder_pair_rep_norm.shape)
