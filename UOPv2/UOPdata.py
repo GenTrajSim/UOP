@@ -165,7 +165,61 @@ def get_next_filename(filepath, step=1000):
     next_filepath = os.path.join(dirpath, next_filename)
     return next_filepath
 
-# 示例
+class create_masks:
+    def __init__(self, noise_C, iterT = 1000, training=True):
+        self.noise_C = noise_C
+        #self.noise_T = noise_T
+        self.iterT = iterT
+        self.training = training
+        self.dictionary = {'MASK':0, 'C':1, 'O':2, 'N':3, 'H':4, 'CLAS':5, 'TEMP':6, 'PRESS':7}
+    def Create_noise(self, pred_t_i, tokens_c,token_n, coords_c,coords_n):
+        bsz = tf.shape(tokens_c)[0]
+        Natom=tf.shape(tokens_c)[1]
+        NO_padding_mask = tf.cast(tf.not_equal(tokens_c, 0), dtype=tf.int32)
+        NO_padding_clas = tf.cast(tf.not_equal(tokens_c, 5), dtype=tf.int32)
+        NO_padding_temp = tf.cast(tf.not_equal(tokens_c, 6), dtype=tf.int32)
+        NO_padding_pres = tf.cast(tf.not_equal(tokens_c, 7), dtype=tf.int32)
+        NO_padding = NO_padding_mask*NO_padding_clas*NO_padding_temp*NO_padding_pres
+        NO_padding = tf.tile(NO_padding,[1,1,3])
+        #
+        #tf.print("NO_padding",NO_padding)
+        ###########################
+        Pred_t = tf.ones(shape=(bsz,1),dtype=tf.int32)
+        if self.training:
+            iter_i = tf.random.uniform(shape=(bsz,1), minval=1, maxval=self.iterT+1, dtype=tf.int32)
+            Pred_t = tf.random.uniform(shape=(bsz,1), minval=0, maxval=2, dtype=tf.int32)
+        noise = tf.random.normal(shape=(bsz,Natom,3))
+        noise = noise*tf.cast(NO_padding,dtype=tf.float32)
+        tf.print("orgion:",pred_t_i)
+        Pred_t = tf.reshape(Pred_t,(bsz,))
+        Pred_t = Pred_t*pred_t_i
+        ##
+        betas = np.linspace(1e-4, self.noise_C, self.iterT,dtype=np.float32) #self.noise_C=0.02
+        alphas= 1.0 - betas
+        alpha_bars = np.cumprod(alphas)
+        alpha_bars_tf = tf.convert_to_tensor(alpha_bars, dtype=tf.float32)
+        t_indices = tf.squeeze(iter_i, axis=1)
+        alpha_bar_t = tf.gather(alpha_bars_tf, t_indices)  # shape=(batch_size,)
+        alpha_bar_t = tf.reshape(alpha_bar_t, (bsz, 1, 1))
+        input_coords = (
+                tf.sqrt(alpha_bar_t)*coords_c +
+                tf.sqrt(1.0-alpha_bar_t) * noise
+                )
+        ##
+        tf.print("orgion:",Pred_t)
+        #tf.print(Pred_t.shape)
+        Pick_out_coord =tf.tile(Pred_t[:, None, None], [1, Natom, 3])  
+        #Pred_t = tf.reshape(Pred_t,(bsz,))
+        iter_i = tf.reshape(iter_i,(bsz,))
+        #tf.print("change:",Pick_out_coord)
+        output_coords = tf.where(Pick_out_coord==1,coords_n,coords_c)
+        return (
+                tokens_c,token_n,input_coords,output_coords,noise,iter_i,Pred_t
+                )
+
+
+
+# Samples
 #filepath1 = '../Data/Paracetamol/Form_I/300.0.0/1.300.0.2000.Paracetamol.xyz'
 #filepath2 = '../Data/Urea/Form_III/std/6.0.0.0.Urea.xyz'
 #
@@ -179,7 +233,21 @@ def get_next_filename(filepath, step=1000):
 
 if __name__ == "__main__":
     dir_prefixes = ["./Data/Paracetamol/", "./Data/Urea/"]
-    colletor = Data_Feeder(dir_prefixes,cutoff = 8,each_system_batch=2) 
+    filename_c_old = 'oldcoords.xyz'
+    filename_c_new = 'newcoords.xyz'
+    filename_e_old = 'oldelement.xyz'
+    filename_e_new = 'newelement.xyz'
+    filename_log = 'traj.log'
+    filename_c_noise = 'noise.xyz'
+    ##
+    fco = open(filename_c_old,'a')
+    fcn = open(filename_c_new,'a')
+    feo = open(filename_e_old,'a')
+    fen = open(filename_e_new,'a')
+    flog= open(filename_log,'a')
+    fcnoise=open(filename_c_noise,'a')
+    ##
+    colletor = Data_Feeder(dir_prefixes,cutoff = 8,each_system_batch=1) 
     #colletor.collect_files()
     files_in_each_dir = colletor.get_files()
 
@@ -201,6 +269,30 @@ if __name__ == "__main__":
                 local_elements_n.shape,
                 local_coords_c.shape,
                 local_coords_n.shape)
+        tf.print(local_coords_c,summarize=500000, output_stream = 'file://'+fco.name)
+        tf.print(local_coords_n,summarize=500000, output_stream = 'file://'+fcn.name)
+        tf.print(local_elements_c,summarize=500000, output_stream = 'file://'+feo.name)
+        tf.print(local_elements_n,summarize=500000, output_stream = 'file://'+fen.name)
+        A = tf.expand_dims(local_label, axis=-1)
+        B = tf.expand_dims(local_temp, axis=-1)
+        C = tf.expand_dims(local_press, axis=-1)
+        D = tf.expand_dims(local_pred_t, axis=-1)
+        #tf.print(tf.concat([tf.cast(A,dtype=tf.float32),tf.cast(B,dtype=tf.float32),tf.cast(C,dtype=tf.float32),tf.cast(D,dtype=tf.float32)],axis=1),summarize=500000, output_stream = 'file://'+flog.name)
+        Noise_creator = create_masks(0.00025)
+        (tokens_c,token_n,input_coords,output_coords,noise,iter_i,Pred_t) = Noise_creator.Create_noise(local_pred_t,local_elements_c,local_elements_n,local_coords_c,local_coords_n)
+        E = tf.expand_dims(iter_i, axis=-1)
+        tf.print(tf.concat([tf.cast(A,dtype=tf.float32),tf.cast(B,dtype=tf.float32),tf.cast(C,dtype=tf.float32),tf.cast(D,dtype=tf.float32),tf.cast(E,dtype=tf.float32)],axis=1),summarize=500000, output_stream = 'file://'+flog.name)
+        tf.print(input_coords,summarize=500000, output_stream = 'file://'+fcnoise.name)
+        tf.print("iter_i.shape:",iter_i.shape)
+        tf.print(iter_i)
+        tf.print("Pred_t.shape",Pred_t.shape)
+        tf.print(Pred_t)
+    fco.close()
+    fcn.close()
+    feo.close()
+    fen.close()
+    flog.close()
+    fcnoise.close()
     #for f in sampled_files:
     #    print(f)
         #print(get_next_filename(f))
