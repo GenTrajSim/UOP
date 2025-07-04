@@ -204,3 +204,15 @@ class Embeding_PT_iter_P0ro1(tf.keras.layers.Layer):
         embeding = self.activation_fn(embeding)
         embeding = tf.reshape(embeding, (-1, self.NATOMS, self.NATOMS, 1))
         return embeding
+
+if __name__ == "__main__":
+    tensor1 = tf.constant([1,1,0,0,1])
+    tensor2 = tf.constant([10,12,7,2,6])
+    layer = Embeding_PT_iter_P0ro1(20,6)
+    bsz = tensor1.shape[0]
+    tensor1=tf.reshape(tensor1,(bsz,1))
+    tensor2=tf.reshape(tensor2,(bsz,1))
+    out = layer(tensor2,tensor1)
+    tf.print("tensor2.shape",tensor2.shape)
+    tf.print("out.shape",out.shape)
+    #tf.print(out)
