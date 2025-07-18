@@ -60,6 +60,7 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
         self.delta_pair_repr_norm_loss = delta_pair_repr_norm_loss#######
         self.num_classes = num_classes
         self.crytal_class = crytal_class
+        self.dictionary = dictionary
         ##
         self.embed_tokens = tf.keras.layers.Embedding(
             len(dictionary), self.encoder_embed_dim, mask_zero=True
@@ -113,23 +114,26 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
     def call(
         self,
         src_tokens,
-        src_distance,
+        #src_distance,
         src_coord,
-        src_edge_type,
-        iter_T, Predict01,
+        #src_edge_type,
+        iter_T,
         encoder_masked_tokens=None,   # always None
         Not_only_features=True,
         PT_predict = True,
         training = False
         #classification_head_name=True
     ):
+        src_diff = tf.expand_dims(src_coord, axis=-2) - tf.expand_dims(src_coord, axis=-3)
+        src_distance = tf.norm(src_diff, axis = -1)
+        src_edge_type = (tf.reshape(src_tokens,[-1,src_tokens.shape[-1],1])*len(self.dictionary)) + tf.reshape(src_tokens,[-1,1,src_tokens.shape[-1]])
         #if not classification_head_name:
         #    features_only = True
         padding_mask = tf.equal(src_tokens, self.padding_idx)
         #if not tf.reduce_any(padding_mask):
         #    padding_mask = None
         x = self.embed_tokens(src_tokens)
-        embedding_bias = self.ebb(iter_T, Predict01) ######################################################
+        embedding_bias = self.ebb(iter_T) ######################################################
         def get_dist_features(dist, et):
             n_node = dist.shape[-1]
             gbf_feature = self.gbf(dist, et)
@@ -266,7 +270,7 @@ if __name__ == "__main__":
     tf.print(dist_matrix)
     iter_i = tf.random.uniform(shape=(token.shape[0],),minval=0,maxval=1000,dtype=tf.int32)
     PorC = tf.random.uniform(shape=(token.shape[0],),minval=0,maxval=2,dtype=tf.int32)
-    out=test_layer(token,dist_matrix,coord,edge,iter_i,PorC)
+    out=test_layer(token,coord,iter_i)
     #tf.print(out.shape)
     (
             logits,   ###token type

@@ -24,7 +24,7 @@ class loss_1:
     #def _pre_function_2(self):
         #
 
-    def ca_loss(self, pred_token, origin_token, pred_coord, origin_coord, pred_cry, origin_cry):
+    def ca_loss(self, pred_token, origin_token, pred_noise, origin_coord, origin_nosie, pred_cry, origin_cry, pred_temp, origin_temp, pred_press, origin_press):
         #mask_token = tf.cast(tf.where( tf.not_equal(orign_token, 0) & tf.not_equal(orign_token,5) & tf.not_equal(orign_token,6) & tf.not_equal(orign_token,7) ,1,0), dtype=tf.int32)
         # token
         token_loss = self.loss_object(origin_token,tf.nn.log_softmax(pred_token,axis=-1))
@@ -44,17 +44,19 @@ class loss_1:
         ##
         tf.print("mask_token:")
         tf.print(mask_token)
-        tf.print(origin_coord * pre_d)
-        tf.print(pred_coord * pre_d)
+        tf.print(origin_nosie * pre_d)
+        tf.print(pred_noise * pre_d)
         # coord
         coord_loss = tf.compat.v1.losses.huber_loss(
-            labels = origin_coord * pre_d,
-            predictions = pred_coord * pre_d,
+            labels = origin_nosie * pre_d,
+            predictions = pred_noise * pre_d,
             weights = tf.cast(tf.tile(tf.expand_dims(mask_token,axis = -1), multiples=[1,1,3]), dtype=tf.float32),
             delta = 0.01
             #reduction=tf.keras.losses.Reduction.NONE
         )
-        loss = token_loss + crystal_loss + coord_loss
+        loss_temp = tf.keras.losses.MSE(origin_temp,pred_temp)
+        loss_press= tf.keras.losses.MSE(origin_press,pred_press)
+        loss = token_loss + crystal_loss + coord_loss + loss_temp + loss_press
         return loss, token_loss, crystal_loss, coord_loss
 
 if __name__ == "__main__":
