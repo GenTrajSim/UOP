@@ -205,6 +205,21 @@ class Embeding_PT_iter_P0ro1(tf.keras.layers.Layer):
         embeding = tf.reshape(embeding, (-1, self.NATOMS, self.NATOMS, 1))
         return embeding
 
+class Pairwise_mlp(tf.keras.layers.Layer):
+    def __init__(self, hidden_dim=64, out_dim=3):
+        super(Pairwise_mlp, self).__init__()
+        #self.hidden_dim = hidden_dim
+        #self.out_dim = out_dim
+        self.dense1 = tf.keras.layers.Dense(hidden_dim) 
+        self.dense2 = tf.keras.layers.Dense(out_dim)
+        #
+        self.activation_fn =  tf.keras.layers.Activation('gelu')
+    def call (self, pair_wise):
+        noise = self.dense1(pair_wise)
+        noise = self.activation_fn(noise)
+        noise = self.dense2(noise)
+        return noise
+
 if __name__ == "__main__":
     tensor1 = tf.constant([1,1,0,0,1])
     tensor2 = tf.constant([10,12,7,2,6])

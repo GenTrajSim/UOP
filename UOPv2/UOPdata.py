@@ -15,11 +15,12 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 
-class Data_Feeder:
+class Data_Feeder(XYZ_reader):
     def __init__(
             self,
             dir_prefixes: List[str],
             each_system_batch=10, max_neighbor=80, cutoff = 5, Traning = False):
+        super(Data_Feeder).__init__()
         self.dir_prefixes = dir_prefixes
         self.files_in_each_dir = []
         #self.total_path = total_path
@@ -97,36 +98,36 @@ class Data_Feeder:
             (local_elements_c, local_coords_c) = parser_current.get_local_env(self.max_neighbor,self.cutoff)
             print(local_elements_c.shape)
             print(local_coords_c.shape)
-            if os.path.exists(nextf):
-                print("next file exist.")
-                parser_next = XYZ_reader(nextf)
-                (local_elements_n, local_coords_n) = parser_next.get_local_env(self.max_neighbor,self.cutoff)
-                predict_t = 1
+            #if os.path.exists(nextf):
+                #print("next file exist.")
+                #parser_next = XYZ_reader(nextf)
+                #(local_elements_n, local_coords_n) = parser_next.get_local_env(self.max_neighbor,self.cutoff)
+                #predict_t = 1
                 #print(local_elements_n.shape)
                 #print(local_coords_n.shape)
-            else:
-                print("without next file!")
-                (local_elements_n, local_coords_n) = (local_elements_n, local_coords_n)
-                predict_t = 0
+            #else:
+                #print("without next file!")
+                #(local_elements_n, local_coords_n) = (local_elements_n, local_coords_n)
+                #predict_t = 0
                 #print(local_elements_n[4])
                 #print(local_coords_n[4])
             local_label = np.full((local_elements_c.shape[0],),label)
             local_temp =  np.full((local_elements_c.shape[0],),temp)
             local_press = np.full((local_elements_c.shape[0],),press)
-            local_pred_t= np.full((local_elements_c.shape[0],),predict_t)
+            #local_pred_t= np.full((local_elements_c.shape[0],),predict_t)
             print(local_label.shape)
             print(local_temp.shape)
             print(local_press.shape)
-            print(local_pred_t)
+            #print(local_pred_t)
             for atom in range(local_label.shape[0]):
-                yield local_label[atom],local_temp[atom],local_press[atom],local_pred_t[atom],local_elements_c[atom],local_elements_n[atom],local_coords_c[atom],local_coords_n[atom]
+                yield local_label[atom],local_temp[atom],local_press[atom],local_elements_c[atom],local_coords_c[atom]
         #return sampled_files
 
     def Generate_batch(self, batch_size, Repeat_size, shuffle_size):
         dataset = tf.data.Dataset.from_generator(
                 self.Generator_Dataset,
-                output_types=(tf.int32,tf.float32,tf.float32, tf.int32, tf.int32,tf.int32, tf.float32, tf.float32), 
-                output_shapes=((),(),(),(),(self.max_neighbor+4,1),(self.max_neighbor+4,1),(self.max_neighbor+4,3),(self.max_neighbor+4,3))
+                output_types=(tf.int32,tf.float32,tf.float32, tf.int32,tf.float32), 
+                output_shapes=((),(),(),(self.max_neighbor+4,1),(self.max_neighbor+4,3))
                 )
         dataset = dataset.repeat(Repeat_size)
         dataset = dataset.shuffle(shuffle_size).batch(batch_size)
@@ -137,8 +138,8 @@ class Data_Feeder:
     def Generate_test_batch(self, batch_size):
         dataset = tf.data.Dataset.from_generator(
                 self.Generator_Dataset,
-                output_types=(tf.int32,tf.float32,tf.float32, tf.int32, tf.int32,tf.int32, tf.float32, tf.float32),
-                output_shapes=((),(),(),(),(self.max_neighbor+4,1),(self.max_neighbor+4,1),(self.max_neighbor+4,3),(self.max_neighbor+4,3))
+                output_types=(tf.int32,tf.float32,tf.float32,tf.int32, tf.float32),
+                output_shapes=((),(),(),(self.max_neighbor+4,1),(self.max_neighbor+4,3))
                 )
         #dataset = dataset.repeat(Repeat_size)
         dataset = dataset.batch(batch_size)
@@ -166,13 +167,14 @@ def get_next_filename(filepath, step=1000):
     return next_filepath
 
 class create_masks:
-    def __init__(self, noise_C, iterT = 1000, training=True):
+    def __init__(self, noise_C,token_noise=0.4, iterT = 50, training=True):
         self.noise_C = noise_C
+        self.token_noise = token_noise
         #self.noise_T = noise_T
         self.iterT = iterT
         self.training = training
         self.dictionary = {'MASK':0, 'C':1, 'O':2, 'N':3, 'H':4, 'CLAS':5, 'TEMP':6, 'PRESS':7}
-    def Create_noise(self, pred_t_i, tokens_c,token_n, coords_c,coords_n):
+    def Create_noise(self, tokens_c, coords_c):
         bsz = tf.shape(tokens_c)[0]
         Natom=tf.shape(tokens_c)[1]
         NO_padding_mask = tf.cast(tf.not_equal(tokens_c, 0), dtype=tf.int32)
@@ -180,21 +182,35 @@ class create_masks:
         NO_padding_temp = tf.cast(tf.not_equal(tokens_c, 6), dtype=tf.int32)
         NO_padding_pres = tf.cast(tf.not_equal(tokens_c, 7), dtype=tf.int32)
         NO_padding = NO_padding_mask*NO_padding_clas*NO_padding_temp*NO_padding_pres
+        #
+        random_MASK_Prob = tf.random.uniform(shape=NO_padding_mask.shape) < self.token_noise
+        weight_token = tf.cast((tf.random.uniform(shape=NO_padding.shape))*(len(self.dictionary)-4)+1, dtype=tf.int32)
+        update_token = weight_token*tf.cast(random_MASK_Prob,dtype=tf.int32)*NO_padding
+        update_token = tf.where(tf.not_equal(update_token,0), update_token, tokens_c)
+        #
         NO_padding = tf.tile(NO_padding,[1,1,3])
         #
         #tf.print("NO_padding",NO_padding)
         ###########################
-        Pred_t = tf.ones(shape=(bsz,1),dtype=tf.int32)
+        #Pred_t = tf.ones(shape=(bsz,1),dtype=tf.int32)
         if self.training:
             iter_i = tf.random.uniform(shape=(bsz,1), minval=1, maxval=self.iterT+1, dtype=tf.int32)
-            Pred_t = tf.random.uniform(shape=(bsz,1), minval=0, maxval=2, dtype=tf.int32)
+            #Pred_t = tf.random.uniform(shape=(bsz,1), minval=0, maxval=2, dtype=tf.int32)
         noise = tf.random.normal(shape=(bsz,Natom,3))
         noise = noise*tf.cast(NO_padding,dtype=tf.float32)
-        tf.print("orgion:",pred_t_i)
-        Pred_t = tf.reshape(Pred_t,(bsz,))
-        Pred_t = Pred_t*pred_t_i
+        ## ca dist
+        #dist = None
+        #dist = tf.norm(coords_c, axis=2, keepdims=True)
+        ## No eq noise
+        #noise = noise #* dist * 0.2
+        #tf.print("dist:=====")
+        #tf.print(tf.reduce_mean(dist))
+        #
+        #tf.print("orgion:",pred_t_i)
+        #Pred_t = tf.reshape(Pred_t,(bsz,))
+        #Pred_t = Pred_t*pred_t_i
         ##
-        betas = np.linspace(1e-4, self.noise_C, self.iterT,dtype=np.float32) #self.noise_C=0.02
+        betas = np.linspace(1e-5, self.noise_C, self.iterT,dtype=np.float32) #self.noise_C=0.02
         alphas= 1.0 - betas
         alpha_bars = np.cumprod(alphas)
         alpha_bars_tf = tf.convert_to_tensor(alpha_bars, dtype=tf.float32)
@@ -206,15 +222,15 @@ class create_masks:
                 tf.sqrt(1.0-alpha_bar_t) * noise
                 )
         ##
-        tf.print("orgion:",Pred_t)
+        #tf.print("orgion:",Pred_t)
         #tf.print(Pred_t.shape)
-        Pick_out_coord =tf.tile(Pred_t[:, None, None], [1, Natom, 3])  
+        #Pick_out_coord =tf.tile(Pred_t[:, None, None], [1, Natom, 3])  
         #Pred_t = tf.reshape(Pred_t,(bsz,))
         iter_i = tf.reshape(iter_i,(bsz,))
         #tf.print("change:",Pick_out_coord)
-        output_coords = tf.where(Pick_out_coord==1,coords_n,coords_c)
+        #output_coords = tf.where(Pick_out_coord==1,coords_n,coords_c)
         return (
-                tokens_c,token_n,input_coords,output_coords,noise,iter_i,Pred_t
+                input_tokens,input_coords,noise,iter_i
                 )
 
 
@@ -259,34 +275,35 @@ if __name__ == "__main__":
     print("===================================")
     #collletor.Generator_Dataset()
     batch_data_test = colletor.Generate_test_batch(10)
-    for (batch, (local_label,local_temp,local_press,local_pred_t,local_elements_c,local_elements_n,local_coords_c,local_coords_n)) in enumerate(batch_data_test):
+    for (batch, (local_label,local_temp,local_press,local_elements_c,local_coords_c)) in enumerate(batch_data_test):
         tf.print(
                 local_label.shape,
                 local_temp.shape,
                 local_press.shape,
-                local_pred_t.shape,
+                #local_pred_t.shape,
                 local_elements_c.shape,
-                local_elements_n.shape,
-                local_coords_c.shape,
-                local_coords_n.shape)
+                #local_elements_n.shape,
+                local_coords_c.shape)
+                #local_coords_n.shape)
         tf.print(local_coords_c,summarize=500000, output_stream = 'file://'+fco.name)
-        tf.print(local_coords_n,summarize=500000, output_stream = 'file://'+fcn.name)
+        #tf.print(local_coords_n,summarize=500000, output_stream = 'file://'+fcn.name)
         tf.print(local_elements_c,summarize=500000, output_stream = 'file://'+feo.name)
-        tf.print(local_elements_n,summarize=500000, output_stream = 'file://'+fen.name)
+        #tf.print(local_elements_n,summarize=500000, output_stream = 'file://'+fen.name)
         A = tf.expand_dims(local_label, axis=-1)
         B = tf.expand_dims(local_temp, axis=-1)
         C = tf.expand_dims(local_press, axis=-1)
-        D = tf.expand_dims(local_pred_t, axis=-1)
+        #D = tf.expand_dims(local_pred_t, axis=-1)
         #tf.print(tf.concat([tf.cast(A,dtype=tf.float32),tf.cast(B,dtype=tf.float32),tf.cast(C,dtype=tf.float32),tf.cast(D,dtype=tf.float32)],axis=1),summarize=500000, output_stream = 'file://'+flog.name)
-        Noise_creator = create_masks(0.00025)
-        (tokens_c,token_n,input_coords,output_coords,noise,iter_i,Pred_t) = Noise_creator.Create_noise(local_pred_t,local_elements_c,local_elements_n,local_coords_c,local_coords_n)
+        Noise_creator = create_masks(0.00040,token_noise=0.2)
+        (input_tokens,input_coords,noise,iter_i) = Noise_creator.Create_noise(local_elements_c,local_coords_c)
         E = tf.expand_dims(iter_i, axis=-1)
-        tf.print(tf.concat([tf.cast(A,dtype=tf.float32),tf.cast(B,dtype=tf.float32),tf.cast(C,dtype=tf.float32),tf.cast(D,dtype=tf.float32),tf.cast(E,dtype=tf.float32)],axis=1),summarize=500000, output_stream = 'file://'+flog.name)
+        tf.print(tf.concat([tf.cast(A,dtype=tf.float32),tf.cast(B,dtype=tf.float32),tf.cast(C,dtype=tf.float32),tf.cast(E,dtype=tf.float32)],axis=1),summarize=500000, output_stream = 'file://'+flog.name)
         tf.print(input_coords,summarize=500000, output_stream = 'file://'+fcnoise.name)
         tf.print("iter_i.shape:",iter_i.shape)
         tf.print(iter_i)
-        tf.print("Pred_t.shape",Pred_t.shape)
-        tf.print(Pred_t)
+        #tf.print("Pred_t.shape",Pred_t.shape)
+        #tf.print(Pred_t)
+        #loss_function = loss_1(1,0.8,4,1)
     fco.close()
     fcn.close()
     feo.close()
