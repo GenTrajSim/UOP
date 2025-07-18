@@ -186,21 +186,21 @@ class Embeding_PT_iter_P0ro1(tf.keras.layers.Layer):
     def __init__(self, Total_T, NATOMS, hidde1=16, hidde2=16, CorP=2):
         super(Embeding_PT_iter_P0ro1, self).__init__()
         self.embed_T = tf.keras.layers.Embedding(Total_T, hidde1)
-        self.embed_C = tf.keras.layers.Embedding(CorP, hidde2)
+        #self.embed_C = tf.keras.layers.Embedding(CorP, hidde2)
         #self.dense_P = tf.keras.layers.Dense(hiddeP)
         #self.dense_T = tf.keras.layers.Dense(hiddeT)
         self.NATOMS = NATOMS
         self.denseall= tf.keras.layers.Dense(self.NATOMS*self.NATOMS)
         self.activation_fn =  tf.keras.layers.Activation('gelu')
-    def call (self, iter_T, Predict01):
+    def call (self, iter_T):
         embedingT = self.embed_T(iter_T)
-        embedingC = self.embed_C(Predict01)
+        #embedingC = self.embed_C(Predict01)
         #denseP = self.dense_P(press)
         #denseT = self.dense_T(temp)
-        embeding = tf.concat([embedingT, embedingC], axis=-1)
+        #embeding = tf.concat([embedingT, embedingC], axis=-1)
         #embeding = tf.concat([embeding, denseP], axis=-1)
         #embeding = tf.concat([embeding, denseT], axis=-1)
-        embeding = self.denseall(embeding)
+        embeding = self.denseall(embedingT)
         embeding = self.activation_fn(embeding)
         embeding = tf.reshape(embeding, (-1, self.NATOMS, self.NATOMS, 1))
         return embeding
@@ -223,7 +223,7 @@ class Pairwise_mlp(tf.keras.layers.Layer):
 if __name__ == "__main__":
     tensor1 = tf.constant([1,1,0,0,1])
     tensor2 = tf.constant([10,12,7,2,6])
-    layer = Embeding_PT_iter_P0ro1(20,6)
+    layer = Embeding_PT_iter_P0ro1(20)
     bsz = tensor1.shape[0]
     tensor1=tf.reshape(tensor1,(bsz,1))
     tensor2=tf.reshape(tensor2,(bsz,1))

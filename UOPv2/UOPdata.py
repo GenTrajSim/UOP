@@ -167,7 +167,7 @@ def get_next_filename(filepath, step=1000):
     return next_filepath
 
 class create_masks:
-    def __init__(self, noise_C,token_noise=0.4, iterT = 50, training=True):
+    def __init__(self, noise_C,token_noise=0.2, iterT = 50, training=True):
         self.noise_C = noise_C
         self.token_noise = token_noise
         #self.noise_T = noise_T
@@ -230,10 +230,33 @@ class create_masks:
         #tf.print("change:",Pick_out_coord)
         #output_coords = tf.where(Pick_out_coord==1,coords_n,coords_c)
         return (
-                input_tokens,input_coords,noise,iter_i
+                update_token,input_coords,noise,iter_i
                 )
 
+## need test ##############################################################################################################
 
+class DiffusionSampler:
+    def __init__(self, score_model, structure_shape, noise_C, iterT=50):
+        self.score_model = score_model
+        self.structure_shape = structure_shape
+        self.iterT = iterT
+        self.betas = tf.linspace(1e-5, noise_C, iterT)
+        self.alphas = 1.0 - self.betas
+        self.alpha_bars = tf.math.cumprod(self.alphas,axis=0)
+    def sample(self, token):
+        x_t = tf.random.randn(self.structure_shape)
+        for t in reversed(range(1, self.iterT + 1)):
+            beta_t = self.betas[t-1]
+            alpha_t = self.alphas[t-1]
+            t_tensor = tf.fill([self.structure_shape[0]], t) if len(self.structure_shape) > 1 else tf.constant([t])
+            pred_noise = self.score_model(x_t, t_tensor, token, training=False)
+            x_prev = (x_t - beta_t * pred_noise) / tf.sqrt(alpha_t)
+            if t>1:
+                x_prev += tf.sqrt(beta_t) * tf.random.normal(tf.shape(x_t))
+            x_t = x_prev
+            return x_t
+            #
+## need test ##############################################################################################################
 
 # Samples
 #filepath1 = '../Data/Paracetamol/Form_I/300.0.0/1.300.0.2000.Paracetamol.xyz'
@@ -294,7 +317,7 @@ if __name__ == "__main__":
         C = tf.expand_dims(local_press, axis=-1)
         #D = tf.expand_dims(local_pred_t, axis=-1)
         #tf.print(tf.concat([tf.cast(A,dtype=tf.float32),tf.cast(B,dtype=tf.float32),tf.cast(C,dtype=tf.float32),tf.cast(D,dtype=tf.float32)],axis=1),summarize=500000, output_stream = 'file://'+flog.name)
-        Noise_creator = create_masks(0.00040,token_noise=0.2)
+        Noise_creator = create_masks(0.00040,token_noise=0.1)
         (input_tokens,input_coords,noise,iter_i) = Noise_creator.Create_noise(local_elements_c,local_coords_c)
         E = tf.expand_dims(iter_i, axis=-1)
         tf.print(tf.concat([tf.cast(A,dtype=tf.float32),tf.cast(B,dtype=tf.float32),tf.cast(C,dtype=tf.float32),tf.cast(E,dtype=tf.float32)],axis=1),summarize=500000, output_stream = 'file://'+flog.name)
