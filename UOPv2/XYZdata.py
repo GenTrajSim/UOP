@@ -10,6 +10,7 @@ from ase.neighborlist import neighbor_list
 
 class XYZ_reader:
     def __init__(self,filename):
+        super(XYZ_reader).__init__()
         self.filename = filename
         self.Natom = None
         self.cell = None

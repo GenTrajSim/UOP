@@ -3,7 +3,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 #import self_attention as sat
 from .encoder import TransformerEncoderWithPair
-from .UOPtool import MaskLMHead,NonLinearHead,GaussianLayer,ClassificationHead,TemperatureHead,PressureHead,DistanceHead,Embeding_PT_iter_P0ro1
+from .UOPtool import MaskLMHead,NonLinearHead,GaussianLayer,ClassificationHead,TemperatureHead,PressureHead,DistanceHead,Embeding_PT_iter_P0ro1,Pairwise_mlp
 
 class Gen3Dmol_Classify(tf.keras.layers.Layer):
     def __init__(
@@ -95,10 +95,10 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
             self.pair2coord_proj  = NonLinearHead(
                 self.encoder_attention_heads, 1
             )
-        if self.masked_dist_loss > 0:
-            self.dist_head = DistanceHead(
-                self.encoder_attention_heads
-            )
+        #if self.masked_dist_loss > 0:
+            #self.dist_head = DistanceHead(
+            #    self.encoder_attention_heads
+            #)
         self.classification_heads = ClassificationHead(input_dim = self.encoder_embed_dim,
                                                        inner_dim = self.encoder_embed_dim,
                                                        num_classes = self.num_classes, 
@@ -106,6 +106,7 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
                                                        pooler_dropout = self.pooler_dropout)
         self.temperatureHead = TemperatureHead(input_dim=self.encoder_embed_dim,inner_dim = self.encoder_embed_dim,out_dim=1,pooler_dropout = self.pooler_dropout)
         self.pressureHead = PressureHead(input_dim=self.encoder_embed_dim,inner_dim = self.encoder_embed_dim,out_dim=1,pooler_dropout = self.pooler_dropout)
+        self.update_nosie = Pairwise_mlp(64,3)
     # classmmethod
     # def build_model(cls, args, task): 
     # return cls(args, task.dictionary)
@@ -164,9 +165,10 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
             attn_probs = self.pair2coord_proj(delta_encoder_pair_rep)
             coord_update = delta_pos / atom_num * attn_probs
             coord_update = tf.reduce_sum(coord_update, axis=2)
-            encoder_coord = coords_emb + coord_update   ###### coord_update noise output
-        if self.masked_dist_loss > 0:
-            encoder_distance = self.dist_head(encoder_pair_rep)
+            up_noise = self.update_nosie(coord_update)
+            #encoder_coord = coords_emb + coord_update   ###### coord_update noise output
+        #if self.masked_dist_loss > 0:
+            #encoder_distance = self.dist_head(encoder_pair_rep)
         if Not_only_features:
             logits_h = self.classification_heads(encoder_rep)
         if PT_predict:
@@ -177,9 +179,9 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
                 logits_h,  ##crystal type
                 temp,
                 press,
-                encoder_distance,
-                encoder_coord,
-                coord_update,
+                #encoder_distance,
+                #encoder_coord,
+                up_noise, #coord_update,
                 x_norm,
                 delta_encoder_pair_rep_norm
                 )
@@ -271,8 +273,8 @@ if __name__ == "__main__":
             logits_h,  ##crystal type
             temp,
             press,
-            encoder_distance,
-            encoder_coord,
+            #encoder_distance,
+            #encoder_coord,
             coord_update,
             x_norm,
             delta_encoder_pair_rep_norm
@@ -281,8 +283,8 @@ if __name__ == "__main__":
     tf.print(logits_h.shape)
     tf.print(temp.shape)
     tf.print(press.shape)
-    tf.print(encoder_distance.shape)
-    tf.print(encoder_coord.shape)
+    #tf.print(encoder_distance.shape)
+    #tf.print(encoder_coord.shape)
     tf.print(coord_update.shape)
     tf.print(x_norm.shape)
     tf.print(delta_encoder_pair_rep_norm.shape)
