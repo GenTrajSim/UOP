@@ -93,11 +93,11 @@ class Data_Feeder(XYZ_reader):
             sampled_files.extend(sampled)
         for f in sampled_files:
             (label,temp,press,time,nextf) = self.read_lable(f)
-            print(label,temp,press,time,nextf)
+            print("DATA_info:",label,temp,press,time,nextf)
             parser_current = XYZ_reader(f)
             (local_elements_c, local_coords_c) = parser_current.get_local_env(self.max_neighbor,self.cutoff)
-            print(local_elements_c.shape)
-            print(local_coords_c.shape)
+            print("DATA_info:",local_elements_c.shape)
+            print("DATA_info:",local_coords_c.shape)
             #if os.path.exists(nextf):
                 #print("next file exist.")
                 #parser_next = XYZ_reader(nextf)
@@ -115,9 +115,9 @@ class Data_Feeder(XYZ_reader):
             local_temp =  np.full((local_elements_c.shape[0],),temp)
             local_press = np.full((local_elements_c.shape[0],),press)
             #local_pred_t= np.full((local_elements_c.shape[0],),predict_t)
-            print(local_label.shape)
-            print(local_temp.shape)
-            print(local_press.shape)
+            print("DATA_info:",local_label.shape)
+            print("DATA_info:",local_temp.shape)
+            print("DATA_info:",local_press.shape)
             #print(local_pred_t)
             for atom in range(local_label.shape[0]):
                 yield local_label[atom],local_temp[atom],local_press[atom],local_elements_c[atom],local_coords_c[atom]
@@ -177,6 +177,7 @@ class create_masks:
     def Create_noise(self, tokens_c, coords_c):
         bsz = tf.shape(tokens_c)[0]
         Natom=tf.shape(tokens_c)[1]
+        tokens_c = tf.reshape(tokens_c, [bsz,Natom])
         NO_padding_mask = tf.cast(tf.not_equal(tokens_c, 0), dtype=tf.int32)
         NO_padding_clas = tf.cast(tf.not_equal(tokens_c, 5), dtype=tf.int32)
         NO_padding_temp = tf.cast(tf.not_equal(tokens_c, 6), dtype=tf.int32)
@@ -188,7 +189,7 @@ class create_masks:
         update_token = weight_token*tf.cast(random_MASK_Prob,dtype=tf.int32)*NO_padding
         update_token = tf.where(tf.not_equal(update_token,0), update_token, tokens_c)
         #
-        NO_padding = tf.tile(NO_padding,[1,1,3])
+        NO_padding = tf.tile(tf.expand_dims(NO_padding,axis=-1),[1,1,3])
         #
         #tf.print("NO_padding",NO_padding)
         ###########################
@@ -236,25 +237,35 @@ class create_masks:
 ## need test ##############################################################################################################
 
 class DiffusionSampler:
-    def __init__(self, score_model, structure_shape, noise_C, iterT=50):
+    def __init__(self, score_model, structure_shape, noise_C=0.02, iterT=50):
         self.score_model = score_model
         self.structure_shape = structure_shape
         self.iterT = iterT
         self.betas = tf.linspace(1e-5, noise_C, iterT)
         self.alphas = 1.0 - self.betas
-        self.alpha_bars = tf.math.cumprod(self.alphas,axis=0)
-    def sample(self, token):
-        x_t = tf.random.randn(self.structure_shape)
+        self.alpha_bars = tf.math.cumprod(self.alphas, axis=0)
+    def sample(self, token, x_t=None):
+        if x_t is None:
+            x_t = tf.random.normal(self.structure_shape)
         for t in reversed(range(1, self.iterT + 1)):
             beta_t = self.betas[t-1]
             alpha_t = self.alphas[t-1]
+            alpha_bar_t = self.alpha_bars[t-1]
             t_tensor = tf.fill([self.structure_shape[0]], t) if len(self.structure_shape) > 1 else tf.constant([t])
-            pred_noise = self.score_model(x_t, t_tensor, token, training=False)
-            x_prev = (x_t - beta_t * pred_noise) / tf.sqrt(alpha_t)
-            if t>1:
-                x_prev += tf.sqrt(beta_t) * tf.random.normal(tf.shape(x_t))
+            out = self.score_model(token, x_t, t_tensor, training=False)
+            (_, _, _, _, pred_noise, _, _) = out
+            coef1 = 1.0 / tf.sqrt(alpha_t)
+            coef2 = (1.0 - alpha_t) / tf.sqrt(1.0 - alpha_bar_t)
+            x_prev = coef1 * (x_t - coef2 * pred_noise)
+            if t > 1:
+                sigma_t = tf.sqrt(beta_t)
+                x_prev += sigma_t * tf.random.normal(tf.shape(x_t))
+            # Debug打印
+            tf.print("t:", t, "x_t mean/std:", tf.reduce_mean(x_t), tf.math.reduce_std(x_t),
+                     "pred_noise mean/std:", tf.reduce_mean(pred_noise), tf.math.reduce_std(pred_noise),
+                     "beta_t:", beta_t, "alpha_t:", alpha_t, "sqrt_alpha_t:", tf.sqrt(alpha_t))
             x_t = x_prev
-            return x_t
+        return x_t
             #
 ## need test ##############################################################################################################
 
@@ -319,6 +330,8 @@ if __name__ == "__main__":
         #tf.print(tf.concat([tf.cast(A,dtype=tf.float32),tf.cast(B,dtype=tf.float32),tf.cast(C,dtype=tf.float32),tf.cast(D,dtype=tf.float32)],axis=1),summarize=500000, output_stream = 'file://'+flog.name)
         Noise_creator = create_masks(0.00040,token_noise=0.1)
         (input_tokens,input_coords,noise,iter_i) = Noise_creator.Create_noise(local_elements_c,local_coords_c)
+        tf.print("origin_tokens:????",local_elements_c)
+        tf.print("input_tokens:?????????????????????",input_tokens)
         E = tf.expand_dims(iter_i, axis=-1)
         tf.print(tf.concat([tf.cast(A,dtype=tf.float32),tf.cast(B,dtype=tf.float32),tf.cast(C,dtype=tf.float32),tf.cast(E,dtype=tf.float32)],axis=1),summarize=500000, output_stream = 'file://'+flog.name)
         tf.print(input_coords,summarize=500000, output_stream = 'file://'+fcnoise.name)

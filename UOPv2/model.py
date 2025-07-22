@@ -30,7 +30,7 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
         x_norm_loss = -1.0,
         delta_pair_repr_norm_loss = -1.0,
         num_classes = 3,
-        crytal_class = 10,
+        token_class = 10,
         dictionary = None
     ):
         super(Gen3Dmol_Classify, self).__init__()
@@ -59,7 +59,7 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
         self.x_norm_loss =x_norm_loss                        ############
         self.delta_pair_repr_norm_loss = delta_pair_repr_norm_loss#######
         self.num_classes = num_classes
-        self.crytal_class = crytal_class
+        self.token_class = token_class
         self.dictionary = dictionary
         ##
         self.embed_tokens = tf.keras.layers.Embedding(
@@ -82,7 +82,7 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
         if self.masked_token_loss > 0:
             self.lm_head = MaskLMHead(
                 embed_dim = self.encoder_embed_dim,
-                output_dim = self.crytal_class,
+                output_dim = self.token_class,
                 weight=None
             )
         K = 128
@@ -124,9 +124,14 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
         training = False
         #classification_head_name=True
     ):
+        #tf.print("src_tokens.shape",src_tokens.shape)
+        bsz = src_tokens.shape[0]
+        Natom_l = src_tokens.shape[1]
+        src_tokens = tf.reshape(src_tokens,[bsz,Natom_l])
         src_diff = tf.expand_dims(src_coord, axis=-2) - tf.expand_dims(src_coord, axis=-3)
         src_distance = tf.norm(src_diff, axis = -1)
         src_edge_type = (tf.reshape(src_tokens,[-1,src_tokens.shape[-1],1])*len(self.dictionary)) + tf.reshape(src_tokens,[-1,1,src_tokens.shape[-1]])
+        #tf.print("src_edge_type.shape",src_edge_type.shape)
         #if not classification_head_name:
         #    features_only = True
         padding_mask = tf.equal(src_tokens, self.padding_idx)
@@ -245,11 +250,11 @@ if __name__ == "__main__":
             x_norm_loss = 1.0,
             delta_pair_repr_norm_loss = 1.0,
             num_classes = 6,
-            crytal_class = len(dictionary),
+            token_class = len(dictionary),
             dictionary = dictionary
             )
     token = tf.constant([[4,5,6,1,1,2,1],[4,5,6,2,3,0,0]])
-    tf.print(token.shape)
+    tf.print("token.shape",token.shape)
     tf.print(token)
     #NO_padding_mask = tf.cast(tf.not_equal(token, 0), dtype=tf.int32)
     #NO_padding_clas = tf.cast(tf.not_equal(token, len(dictionary)-1), dtype=tf.int32)

@@ -4,7 +4,7 @@ from tensorflow.keras import layers
 import numpy as np
 
 class loss_1:
-    def __init__(self, pre_p, cutoff, dl, function):
+    def __init__(self, pre_p, cutoff, dl, c0, function):
         self.pre_p = pre_p
         self.cutoff= cutoff
         self.dl = dl
@@ -14,7 +14,7 @@ class loss_1:
         if function ==0:
             self._pre_function = lambda x: 1.0/(x + 1e-8)
         if function ==1:
-            self._pre_function = lambda x: 1 - tf.math.erf( self.dl*(x-self.cutoff))
+            self._pre_function = lambda x: ((1 - tf.math.erf( self.dl*(x-self.cutoff)))/2) + c0
         if function ==2:
             self._pre_function = tf.identity
     #def _pre_function_0(self):
@@ -24,7 +24,7 @@ class loss_1:
     #def _pre_function_2(self):
         #
 
-    def ca_loss(self, pred_token, origin_token, pred_noise, origin_coord, origin_nosie, pred_cry, origin_cry, pred_temp, origin_temp, pred_press, origin_press):
+    def ca_loss(self, pred_token, origin_token, pred_noise, origin_coord, origin_nosie, pred_cry, origin_cry, pred_temp, origin_temp, pred_press, origin_press,norm_x,norm_pair):
         #mask_token = tf.cast(tf.where( tf.not_equal(orign_token, 0) & tf.not_equal(orign_token,5) & tf.not_equal(orign_token,6) & tf.not_equal(orign_token,7) ,1,0), dtype=tf.int32)
         # token
         token_loss = self.loss_object(origin_token,tf.nn.log_softmax(pred_token,axis=-1))
@@ -35,32 +35,29 @@ class loss_1:
         dist = tf.norm(origin_coord, axis=2, keepdims=True)
         pre_d = self.pre_p*self._pre_function(dist)
         ####
-        tf.print("dist:")
-        tf.print(dist.shape)
-        tf.print("pre_d:")
-        tf.print(pre_d)
+        #tf.print("UOP loss-- dist:",dist.shape,"pre_d:",pre_d.shape)
         #
         mask_token = tf.cast(tf.where( tf.not_equal(origin_token, 0) & tf.not_equal(origin_token,5) & tf.not_equal(origin_token,6) & tf.not_equal(origin_token,7) ,1,0), dtype=tf.int32)
         ##
-        tf.print("mask_token:")
-        tf.print(mask_token)
-        tf.print(origin_nosie * pre_d)
-        tf.print(pred_noise * pre_d)
+        #tf.print("UOP loss-- mask_token:", mask_token.shape, (origin_nosie * pre_d).shape, (pred_noise * pre_d).shape)
         # coord
-        coord_loss = tf.compat.v1.losses.huber_loss(
-            labels = origin_nosie * pre_d,
-            predictions = pred_noise * pre_d,
-            weights = tf.cast(tf.tile(tf.expand_dims(mask_token,axis = -1), multiples=[1,1,3]), dtype=tf.float32),
-            delta = 0.01
-            #reduction=tf.keras.losses.Reduction.NONE
-        )
+        labels = origin_nosie #* pre_d * tf.cast(tf.tile(tf.expand_dims(mask_token,-1), multiples=[1,1,3]), dtype=tf.float32)
+        predictions = pred_noise #* pre_d * tf.cast(tf.tile(tf.expand_dims(mask_token,-1), multiples=[1,1,3]), dtype=tf.float32)
+        coord_loss = tf.keras.losses.MSE(labels, predictions)
+        #coord_loss = tf.compat.v1.losses.huber_loss(
+        #    labels = origin_nosie * pre_d,
+        #    predictions = pred_noise * pre_d,
+        #    weights = tf.cast(tf.tile(tf.expand_dims(mask_token,-1), multiples=[1,1,3]), dtype=tf.float32),
+        #    delta = 0.01
+        #    #reduction=tf.keras.losses.Reduction.NONE
+        #)
         loss_temp = tf.keras.losses.MSE(origin_temp,pred_temp)
         loss_press= tf.keras.losses.MSE(origin_press,pred_press)
-        loss = token_loss + crystal_loss + coord_loss + loss_temp + loss_press
-        return loss, token_loss, crystal_loss, coord_loss
+        loss = token_loss + (coord_loss*10) # + (norm_x + norm_pair)*0.01 #+ (loss_temp*0.001) + (loss_press*0.00001) 
+        return loss, token_loss, crystal_loss, coord_loss, loss_temp,loss_press,norm_x,norm_pair
 
 if __name__ == "__main__":
-    loss_function = loss_1(1,0.8,4,1)
+    loss_function = loss_1(1,0.8,4,1,1)
     pred_token = tf.random.uniform(shape=(2, 7, 8), minval=0, maxval=1, dtype=tf.float32) #tf.constant([[5,6,7,1,1,1,2],[5,6,7,1,2,3,0]])
     tf.print(pred_token.shape)
     tf.print(pred_token)
