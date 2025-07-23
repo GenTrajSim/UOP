@@ -3,7 +3,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 #import self_attention as sat
 from .encoder import TransformerEncoderWithPair
-from .UOPtool import MaskLMHead,NonLinearHead,GaussianLayer,ClassificationHead,TemperatureHead,PressureHead,DistanceHead,Embeding_PT_iter_P0ro1,Pairwise_mlp
+from .UOPtool import MaskLMHead,NonLinearHead,GaussianLayer,ClassificationHead,TemperatureHead,PressureHead,DistanceHead,Embeding_PT_iter_P0ro1,Pairwise_mlp,Embeding_iter_token
 
 class Gen3Dmol_Classify(tf.keras.layers.Layer):
     def __init__(
@@ -91,7 +91,8 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
             K+1, self.encoder_attention_heads
         )
         self.gbf = GaussianLayer(K, n_edge_type)
-        self.ebb = Embeding_PT_iter_P0ro1(self.iterT, self.Natom) #######################################################
+        self.ebb = Embeding_PT_iter_P0ro1(self.iterT+1, self.Natom, self.encoder_attention_heads) #######################################################
+        self.ebb_token = Embeding_iter_token(self.iterT+1, self.Natom, self.encoder_embed_dim)
         if self.masked_coord_loss > 0:
             self.pair2coord_proj  = NonLinearHead(
                 self.encoder_attention_heads, 1
@@ -107,7 +108,7 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
                                                        pooler_dropout = self.pooler_dropout)
         self.temperatureHead = TemperatureHead(input_dim=self.encoder_embed_dim,inner_dim = self.encoder_embed_dim,out_dim=1,pooler_dropout = self.pooler_dropout)
         self.pressureHead = PressureHead(input_dim=self.encoder_embed_dim,inner_dim = self.encoder_embed_dim,out_dim=1,pooler_dropout = self.pooler_dropout)
-        self.update_nosie = Pairwise_mlp(64,3)
+        self.update_nosie = Pairwise_mlp(2048,3)
     # classmmethod
     # def build_model(cls, args, task): 
     # return cls(args, task.dictionary)
@@ -138,12 +139,15 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
         #if not tf.reduce_any(padding_mask):
         #    padding_mask = None
         x = self.embed_tokens(src_tokens)
+        embedding_x = self.ebb_token(iter_T)
+        x = x + embedding_x
         embedding_bias = self.ebb(iter_T) ######################################################
         def get_dist_features(dist, et):
             n_node = dist.shape[-1]
             gbf_feature = self.gbf(dist, et)
-            gbf_feature = tf.concat([gbf_feature,embedding_bias], axis=-1)
+            #gbf_feature = tf.concat([gbf_feature,embedding_bias], axis=-1)
             gbf_result = self.gbf_proj(gbf_feature)
+            gbf_result = gbf_result + embedding_bias
             graph_attn_bias = gbf_result
             graph_attn_bias = tf.transpose(graph_attn_bias, perm=[0,3,1,2])
             graph_attn_bias = tf.reshape(graph_attn_bias, (-1, n_node, n_node))

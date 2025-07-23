@@ -66,7 +66,7 @@ if ckpt_manager.latest_checkpoint:
     ckpt.restore(ckpt_manager.latest_checkpoint)
     print ('Latest checkpoint restored!!')
 
-l_r = 0.000004 # CustomSchedule(512)
+l_r = 0.000045 # CustomSchedule(512)
 optimizer = tf.keras.optimizers.Adam(learning_rate=l_r, beta_1=0.9, beta_2=0.98,
                                      epsilon=1e-9)
 train_total_loss = tf.keras.metrics.Mean(name='total_loss')
@@ -80,6 +80,7 @@ train_normpair_loss = tf.keras.metrics.Mean(name='norm_pair_loss')
 #train_accur_labl = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
 train_token_labl = tf.keras.metrics.SparseCategoricalAccuracy(name='train_token_accuracy')
 Noise_creator = create_masks(max_noiseS,token_noise=0.1, iterT = max_iterT, training=True)
+Noise_test_creator = create_masks(max_noiseS,token_noise=0.1, iterT = max_iterT, training=False)
 loss_function = loss_1(1,0.8,0,1,1)
 
 #@tf.function
@@ -151,13 +152,14 @@ def main(epochs):
             #tf.keras.backend.clear_session()
         ckpt_save_path = ckpt_manager.save()
         tf.print('Saving checkpoint for epoch {} at {}'.format(epoch+1,ckpt_save_path))
-#    test_colletor = Data_Feeder(dir_prefixes,cutoff = 8,max_neighbor=max_neighbor,each_system_batch=1)
-#    test_batch_data = colletor.Generate_test_batch(batch_size=1)
-#    for (batch, (local_label,local_temp,local_press,local_elements,local_coords)) in enumerate(test_batch_data):
-#        sampling = DiffusionSampler(score_model,local_coords.shape,max_noiseS,iterT=max_iterT)
-#        (input_tokens,input_coords,noise,iter_i) = Noise_creator.Create_noise(local_elements,local_coords)
-#        x_t = sampling.sample(input_tokens,input_coords)
-#        tf.print(x_t,summarize=500000)
+    test_colletor = Data_Feeder(dir_prefixes,cutoff = 8,max_neighbor=max_neighbor,each_system_batch=1)
+    test_batch_data = colletor.Generate_test_batch(batch_size=1)
+    for (batch, (local_label,local_temp,local_press,local_elements,local_coords)) in enumerate(test_batch_data):
+        (input_tokens,input_coords,noise,iter_i) = Noise_test_creator.Create_noise(local_elements,local_coords)
+        sampling = DiffusionSampler(score_model,local_coords.shape,max_noiseS,iterT=max_iterT)
+        #(input_tokens,input_coords,noise,iter_i) = Noise_creator.Create_noise(local_elements,local_coords)
+        x_t = sampling.sample(input_tokens,input_coords)
+        tf.print(x_t,summarize=500000)
         #tf.keras.backend.clear_session()
 
 if __name__ == "__main__":

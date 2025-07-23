@@ -41,8 +41,8 @@ class loss_1:
         ##
         #tf.print("UOP loss-- mask_token:", mask_token.shape, (origin_nosie * pre_d).shape, (pred_noise * pre_d).shape)
         # coord
-        labels = origin_nosie #* pre_d * tf.cast(tf.tile(tf.expand_dims(mask_token,-1), multiples=[1,1,3]), dtype=tf.float32)
-        predictions = pred_noise #* pre_d * tf.cast(tf.tile(tf.expand_dims(mask_token,-1), multiples=[1,1,3]), dtype=tf.float32)
+        labels = tf.reshape( origin_nosie, [origin_nosie.shape[0],-1]) #* pre_d * tf.cast(tf.tile(tf.expand_dims(mask_token,-1), multiples=[1,1,3]), dtype=tf.float32)
+        predictions = tf.reshape( pred_noise, [pred_noise.shape[0], -1] ) #* pre_d * tf.cast(tf.tile(tf.expand_dims(mask_token,-1), multiples=[1,1,3]), dtype=tf.float32)
         coord_loss = tf.keras.losses.MSE(labels, predictions)
         #coord_loss = tf.compat.v1.losses.huber_loss(
         #    labels = origin_nosie * pre_d,

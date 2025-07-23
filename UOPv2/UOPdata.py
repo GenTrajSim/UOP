@@ -197,6 +197,8 @@ class create_masks:
         if self.training:
             iter_i = tf.random.uniform(shape=(bsz,1), minval=1, maxval=self.iterT+1, dtype=tf.int32)
             #Pred_t = tf.random.uniform(shape=(bsz,1), minval=0, maxval=2, dtype=tf.int32)
+        else:
+            iter_i = tf.cast( tf.fill([bsz, 1], self.iterT), dtype=tf.int32)
         noise = tf.random.normal(shape=(bsz,Natom,3))
         noise = noise*tf.cast(NO_padding,dtype=tf.float32)
         ## ca dist
@@ -211,7 +213,7 @@ class create_masks:
         #Pred_t = tf.reshape(Pred_t,(bsz,))
         #Pred_t = Pred_t*pred_t_i
         ##
-        betas = np.linspace(1e-5, self.noise_C, self.iterT,dtype=np.float32) #self.noise_C=0.02
+        betas = np.linspace(1e-5, self.noise_C, self.iterT+1,dtype=np.float32) #self.noise_C=0.02
         alphas= 1.0 - betas
         alpha_bars = np.cumprod(alphas)
         alpha_bars_tf = tf.convert_to_tensor(alpha_bars, dtype=tf.float32)
@@ -251,9 +253,14 @@ class DiffusionSampler:
             beta_t = self.betas[t-1]
             alpha_t = self.alphas[t-1]
             alpha_bar_t = self.alpha_bars[t-1]
-            t_tensor = tf.fill([self.structure_shape[0]], t) if len(self.structure_shape) > 1 else tf.constant([t])
+            bsz = token.shape[0]
+            t_tensor = tf.cast( tf.fill([bsz, 1], t), dtype=tf.int32)
+            t_tensor = tf.reshape(t_tensor,(bsz,))
+            #t_tensor = tf.fill([self.structure_shape[0]], t) if len(self.structure_shape) > 1 else tf.constant([t])
             out = self.score_model(token, x_t, t_tensor, training=False)
-            (_, _, _, _, pred_noise, _, _) = out
+            (pred_tokens, _, _, _, pred_noise, _, _) = out
+            pred_tokens = tf.argmax(pred_tokens, axis=-1) 
+            token = pred_tokens
             coef1 = 1.0 / tf.sqrt(alpha_t)
             coef2 = (1.0 - alpha_t) / tf.sqrt(1.0 - alpha_bar_t)
             x_prev = coef1 * (x_t - coef2 * pred_noise)
@@ -264,6 +271,8 @@ class DiffusionSampler:
             tf.print("t:", t, "x_t mean/std:", tf.reduce_mean(x_t), tf.math.reduce_std(x_t),
                      "pred_noise mean/std:", tf.reduce_mean(pred_noise), tf.math.reduce_std(pred_noise),
                      "beta_t:", beta_t, "alpha_t:", alpha_t, "sqrt_alpha_t:", tf.sqrt(alpha_t))
+            if t == 99:
+                tf.print(x_prev,summarize=500000)
             x_t = x_prev
         return x_t
             #

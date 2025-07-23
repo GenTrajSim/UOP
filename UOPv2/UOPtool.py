@@ -183,16 +183,17 @@ class DistanceHead(tf.keras.layers.Layer):
         return x
 
 class Embeding_PT_iter_P0ro1(tf.keras.layers.Layer):
-    def __init__(self, Total_T, NATOMS, hidde1=16, hidde2=16, CorP=2):
+    def __init__(self, Total_T, NATOMS, out):
         super(Embeding_PT_iter_P0ro1, self).__init__()
-        self.embed_T = tf.keras.layers.Embedding(Total_T, hidde1)
+        self.embed_T = tf.keras.layers.Embedding(Total_T, out)
         #self.embed_C = tf.keras.layers.Embedding(CorP, hidde2)
         #self.dense_P = tf.keras.layers.Dense(hiddeP)
         #self.dense_T = tf.keras.layers.Dense(hiddeT)
-        self.NATOMS = NATOMS
-        self.denseall= tf.keras.layers.Dense(self.NATOMS*self.NATOMS)
-        self.activation_fn =  tf.keras.layers.Activation('gelu')
+        #self.NATOMS = NATOMS
+        #self.denseall= tf.keras.layers.Dense(self.NATOMS*self.NATOMS)
+        #self.activation_fn =  tf.keras.layers.Activation('gelu')
     def call (self, iter_T):
+        #embedingT = self.embed_T(tf.squeeze(iter_T,axis=-1))
         embedingT = self.embed_T(iter_T)
         #embedingC = self.embed_C(Predict01)
         #denseP = self.dense_P(press)
@@ -200,9 +201,36 @@ class Embeding_PT_iter_P0ro1(tf.keras.layers.Layer):
         #embeding = tf.concat([embedingT, embedingC], axis=-1)
         #embeding = tf.concat([embeding, denseP], axis=-1)
         #embeding = tf.concat([embeding, denseT], axis=-1)
-        embeding = self.denseall(embedingT)
-        embeding = self.activation_fn(embeding)
-        embeding = tf.reshape(embeding, (-1, self.NATOMS, self.NATOMS, 1))
+        #embeding = self.denseall(embedingT)
+        #embeding = self.activation_fn(embeding)
+        embeding = tf.expand_dims(embedingT,axis=1)
+        embeding = tf.expand_dims(embeding,axis=1)
+        #embeding = tf.reshape(embeding, (-1, self.NATOMS, self.NATOMS, 1))
+        return embeding
+        
+class Embeding_iter_token(tf.keras.layers.Layer):
+    def __init__(self, Total_T, NATOMS, out):
+        super(Embeding_iter_token, self).__init__()
+        self.embed_T = tf.keras.layers.Embedding(Total_T, out)
+        #self.embed_C = tf.keras.layers.Embedding(CorP, hidde2)
+        #self.dense_P = tf.keras.layers.Dense(hiddeP)
+        #self.dense_T = tf.keras.layers.Dense(hiddeT)
+        #self.NATOMS = NATOMS
+        #self.denseall= tf.keras.layers.Dense(self.NATOMS*self.NATOMS)
+        #self.activation_fn =  tf.keras.layers.Activation('gelu')
+    def call (self, iter_T):
+        #embedingT = self.embed_T(tf.squeeze(iter_T,axis=-1))
+        embedingT = self.embed_T(iter_T)
+        #embedingC = self.embed_C(Predict01)
+        #denseP = self.dense_P(press)
+        #denseT = self.dense_T(temp)
+        #embeding = tf.concat([embedingT, embedingC], axis=-1)
+        #embeding = tf.concat([embeding, denseP], axis=-1)
+        #embeding = tf.concat([embeding, denseT], axis=-1)
+        #embeding = self.denseall(embedingT)
+        #embeding = self.activation_fn(embeding)
+        embeding = tf.expand_dims(embedingT,axis=1)
+        #embeding = tf.reshape(embeding, (-1, self.NATOMS, self.NATOMS, 1))
         return embeding
 
 class Pairwise_mlp(tf.keras.layers.Layer):
