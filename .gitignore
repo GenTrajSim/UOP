@@ -8,7 +8,8 @@
 
 checkpoint_UOPv2_test_0.0.01/train/ckpt-18.data-00000-of-00001
 *.data-00000-of-00001
-
+#
+pass
 # 
 /tmp/
 

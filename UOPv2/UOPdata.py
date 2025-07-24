@@ -243,7 +243,7 @@ class DiffusionSampler:
         self.score_model = score_model
         self.structure_shape = structure_shape
         self.iterT = iterT
-        self.betas = tf.linspace(1e-5, noise_C, iterT)
+        self.betas = tf.linspace(1e-5, noise_C, iterT+1)
         self.alphas = 1.0 - self.betas
         self.alpha_bars = tf.math.cumprod(self.alphas, axis=0)
     def sample(self, token, x_t=None):
@@ -271,7 +271,7 @@ class DiffusionSampler:
             tf.print("t:", t, "x_t mean/std:", tf.reduce_mean(x_t), tf.math.reduce_std(x_t),
                      "pred_noise mean/std:", tf.reduce_mean(pred_noise), tf.math.reduce_std(pred_noise),
                      "beta_t:", beta_t, "alpha_t:", alpha_t, "sqrt_alpha_t:", tf.sqrt(alpha_t))
-            if t == 99:
+            if t == 100:
                 tf.print(x_prev,summarize=500000)
             x_t = x_prev
         return x_t

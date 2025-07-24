@@ -53,7 +53,7 @@ class loss_1:
         #)
         loss_temp = tf.keras.losses.MSE(origin_temp,pred_temp)
         loss_press= tf.keras.losses.MSE(origin_press,pred_press)
-        loss = token_loss + (coord_loss*10) # + (norm_x + norm_pair)*0.01 #+ (loss_temp*0.001) + (loss_press*0.00001) 
+        loss = token_loss + (coord_loss*10)  + (norm_x + norm_pair)*0.001 #+ (loss_temp*0.001) + (loss_press*0.00001) 
         return loss, token_loss, crystal_loss, coord_loss, loss_temp,loss_press,norm_x,norm_pair
 
 if __name__ == "__main__":
