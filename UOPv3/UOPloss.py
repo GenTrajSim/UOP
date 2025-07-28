@@ -4,13 +4,16 @@ from tensorflow.keras import layers
 import numpy as np
 
 class loss_1:
-    def __init__(self, pre_p, cutoff, dl, c0, function):
+    def __init__(self, pre_p, cutoff, dl, c0, function, max_iter_T = 1000):
         self.pre_p = pre_p
         self.cutoff= cutoff
         self.dl = dl
+        self.max_iter_T = max_iter_T
         self.dictionary = {'MASK':0, 'C':1, 'O':2, 'N':3, 'H':4, 'CLAS':5, 'TEMP':6, 'PRESS':7}
         self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True, ignore_class=0)
-        self.loss_object_cry = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        self.loss_object_cry = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True, reduction='none') ###
+        self.mse_P =tf.keras.losses.MeanSquaredError(reduction='none')
+        self.mse_T =tf.keras.losses.MeanSquaredError(reduction='none')
         if function ==0:
             self._pre_function = lambda x: 1.0/(x + 1e-8)
         if function ==1:
@@ -24,12 +27,12 @@ class loss_1:
     #def _pre_function_2(self):
         #
 
-    def ca_loss(self, pred_token, origin_token, pred_noise, origin_coord, origin_nosie, pred_cry, origin_cry, pred_temp, origin_temp, pred_press, origin_press,norm_x,norm_pair):
+    def ca_loss(self, pred_token, origin_token, pred_noise, origin_coord, origin_nosie, pred_cry, origin_cry, pred_temp, origin_temp, pred_press, origin_press,norm_x,norm_pair,iter_T):
         #mask_token = tf.cast(tf.where( tf.not_equal(orign_token, 0) & tf.not_equal(orign_token,5) & tf.not_equal(orign_token,6) & tf.not_equal(orign_token,7) ,1,0), dtype=tf.int32)
         # token
         token_loss = self.loss_object(origin_token,tf.nn.log_softmax(pred_token,axis=-1))
         # crystal
-        crystal_loss=self.loss_object_cry(origin_cry,tf.nn.log_softmax(pred_cry,axis=-1))
+        #crystal_loss=self.loss_object_cry(origin_cry,tf.nn.log_softmax(pred_cry,axis=-1))
         # dist
         dist = None
         dist = tf.norm(origin_coord, axis=2, keepdims=True)
@@ -51,9 +54,22 @@ class loss_1:
         #    delta = 0.01
         #    #reduction=tf.keras.losses.Reduction.NONE
         #)
-        loss_temp = tf.keras.losses.MSE(origin_temp,pred_temp)
-        loss_press= tf.keras.losses.MSE(origin_press,pred_press)
-        loss = token_loss + (coord_loss*2)  + (norm_x + norm_pair)*0.01 #+ (loss_temp*0.001) + (loss_press*0.00001) 
+        ## MASK iterT 
+        #mask_iterT = tf.cast(tf.equal(iter_T, 1), tf.float32)
+        mask_iterT = (self.max_iter_T - tf.cast(iter_T, tf.float32)) / (self.max_iter_T - 1)
+        mask_iterT = tf.clip_by_value(mask_iterT, 0.0, 1.0)
+        # crystal
+        crystal_loss = self.loss_object_cry(origin_cry,tf.nn.log_softmax(pred_cry,axis=-1))
+        crystal_loss = tf.reduce_sum(crystal_loss * mask_iterT) / (tf.reduce_sum(mask_iterT) + 1e-8)
+        ##
+        #loss_temp = tf.keras.losses.MSE(origin_temp,pred_temp)
+        loss_temp = self.mse_T(origin_temp,pred_temp)
+        loss_temp = tf.reduce_sum(loss_temp * mask_iterT) / (tf.reduce_sum(mask_iterT) + 1e-8)
+        #loss_press= tf.keras.losses.MSE(origin_press,pred_press)
+        loss_press = self.mse_P(origin_press,pred_press)
+        loss_press = tf.reduce_sum(loss_press * mask_iterT) / (tf.reduce_sum(mask_iterT) + 1e-8)
+        ##
+        loss = token_loss + (coord_loss*2)  + (norm_x + norm_pair)*0.001 + 0.00000001*(crystal_loss + loss_temp + loss_press) 
         return loss, token_loss, crystal_loss, coord_loss, loss_temp,loss_press,norm_x,norm_pair
 
 if __name__ == "__main__":

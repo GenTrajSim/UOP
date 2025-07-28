@@ -88,8 +88,11 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
         K = 128
         n_edge_type = len(dictionary) * len(dictionary)
         self.gbf_proj = NonLinearHead(
-            K+1, self.encoder_attention_heads
+            K+1, self.encoder_attention_heads #K+1 origin
         )
+        self.gbf_proj2=NonLinearHead(
+                self.encoder_attention_heads,self.encoder_attention_heads
+                )
         self.gbf = GaussianLayer(K, n_edge_type)
         self.ebb = Embeding_PT_iter_P0ro1(self.iterT+1, self.Natom, self.encoder_attention_heads) #######################################################
         self.ebb_token = Embeding_iter_token(self.iterT+1, self.Natom, self.encoder_embed_dim)
@@ -108,7 +111,7 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
                                                        pooler_dropout = self.pooler_dropout)
         self.temperatureHead = TemperatureHead(input_dim=self.encoder_embed_dim,inner_dim = self.encoder_embed_dim,out_dim=1,pooler_dropout = self.pooler_dropout)
         self.pressureHead = PressureHead(input_dim=self.encoder_embed_dim,inner_dim = self.encoder_embed_dim,out_dim=1,pooler_dropout = self.pooler_dropout)
-        self.update_nosie = Pairwise_mlp(2048,3)
+        self.update_nosie = Pairwise_mlp(self.encoder_ffn_embed_dim,3)
     # classmmethod
     # def build_model(cls, args, task): 
     # return cls(args, task.dictionary)
@@ -119,6 +122,8 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
         src_coord,
         #src_edge_type,
         iter_T,
+        press,
+        temp,
         encoder_masked_tokens=None,   # always None
         Not_only_features=True,
         PT_predict = True,
@@ -139,17 +144,20 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
         #if not tf.reduce_any(padding_mask):
         #    padding_mask = None
         x = self.embed_tokens(src_tokens)
-        embedding_x = self.ebb_token(iter_T)
-        #x = self.ebb_token(iter_T,x)
-        x = x + embedding_x
-        embedding_bias = self.ebb(iter_T) ######################################################
-        #embedding_bias = tf.broadcast_to(embedding_bias, (bsz, Natom_l, Natom_l, embedding_bias.shape[-1]))
+        ##############
+        x = self.ebb_token(iter_T,x,press,temp)
+        #x = self.ebb_token(iter_T,x,press,temp)
+        #x = x + embedding_x
+        embedding_bias = self.ebb(iter_T,press,temp) ######################################################
+        embedding_bias = tf.broadcast_to(embedding_bias, (bsz, Natom_l, Natom_l, embedding_bias.shape[-1]))
         def get_dist_features(dist, et):
             n_node = dist.shape[-1]
             gbf_feature = self.gbf(dist, et)
             #gbf_feature = tf.concat([gbf_feature,embedding_bias], axis=-1)
             #
             gbf_result = self.gbf_proj(gbf_feature)
+            #gbf_result = tf.concat([gbf_result,embedding_bias], axis=-1)
+            gbf_result = self.gbf_proj2(gbf_result)
             gbf_result = gbf_result + embedding_bias
             graph_attn_bias = gbf_result
             graph_attn_bias = tf.transpose(graph_attn_bias, perm=[0,3,1,2])

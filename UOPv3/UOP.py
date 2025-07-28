@@ -18,10 +18,10 @@ dictionary = {'MASK':0, 'C':1, 'O':2, 'N':3, 'H':4, 'CLAS':5, 'TEMP':6, 'PRESS':
 crystal = {'Paracetamol_I':0,'Paracetamol_II':1, 'Paracetamol_III':2, 'Urea_I':3, 'Urea_II':4, 'Urea_III':5, 'ice_0':6, 'ice_Ih':7,'ice_Ic':8}
 
 score_model = Gen3Dmol_Classify(
-        encoder_layers = 11,
-        encoder_embed_dim = 2048,
-        encoder_ffn_embed_dim = 2048,
-        encoder_attention_heads = 16,
+        encoder_layers = 10,
+        encoder_embed_dim = 4096,
+        encoder_ffn_embed_dim = 4096,
+        encoder_attention_heads = 32,
         Natom = max_neighbor+4, ###############
         iterT = max_iterT,
         dropout = 0.1,
@@ -54,7 +54,7 @@ class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
         return tf.math.rsqrt(self.d_model) * tf.math.minimum(arg1, arg2)
 
 
-checkpoint_path = "./checkpoint_UOPv2_test_0.0.01/train"
+checkpoint_path = "./checkpoint_UOPv3_test_0.0.01/train"
 step = tf.Variable(0, name="step")
 
 #l_r = 0.000000001 # CustomSchedule(512)
@@ -66,7 +66,7 @@ if ckpt_manager.latest_checkpoint:
     ckpt.restore(ckpt_manager.latest_checkpoint)
     print ('Latest checkpoint restored!!')
 
-l_r = 0.000009 # CustomSchedule(512)
+l_r = 0.00003 # CustomSchedule(512)
 optimizer = tf.keras.optimizers.Adam(learning_rate=l_r, beta_1=0.9, beta_2=0.98,
                                      epsilon=1e-9)
 train_total_loss = tf.keras.metrics.Mean(name='total_loss')
@@ -81,7 +81,7 @@ train_normpair_loss = tf.keras.metrics.Mean(name='norm_pair_loss')
 train_token_labl = tf.keras.metrics.SparseCategoricalAccuracy(name='train_token_accuracy')
 Noise_creator = create_masks(max_noiseS,token_noise=0.1, iterT = max_iterT, training=True)
 Noise_test_creator = create_masks(max_noiseS,token_noise=0.1, iterT = max_iterT, training=False)
-loss_function = loss_1(1,0.8,0,1,1)
+loss_function = loss_1(1,0.8,0,1,1,max_iterT)
 
 @tf.function
 def train_step(label_o, token_o, coord_o, temp_o,press_o):
@@ -94,10 +94,10 @@ def train_step(label_o, token_o, coord_o, temp_o,press_o):
     #tf.print("UOP main-- input_tokens.shape",input_tokens.shape, "input_coords.shape",input_coords.shape,"noise.shape",noise.shape,"iter_i.shape",iter_i)
     
     with tf.GradientTape() as tape:
-        out = score_model(input_tokens,input_coords,iter_i,training=True)
+        out = score_model(input_tokens,input_coords,iter_i,press_o,temp_o,training=True)
         (token_p, label_p, temp_p, press_p, noise_p, x_norm, delta_encoder_pair_rep_norm) = out
         #tf.print("UOP main-- token_p.shape",token_p.shape,"label_p.shape",label_p.shape,"temp_p.shape",temp_p.shape,"press_p.shape",press_p.shape,"noise_p.shape",noise_p.shape,"x_norm:",x_norm,"delta_encoder_pair_rep_norm:",delta_encoder_pair_rep_norm)
-        loss = loss_function.ca_loss(token_p, token_o, noise_p, coord_o, noise, label_p, label_o, temp_p,temp_o, press_p,press_o, x_norm, delta_encoder_pair_rep_norm)
+        loss = loss_function.ca_loss(token_p, token_o, noise_p, coord_o, noise, label_p, label_o, temp_p,temp_o, press_p,press_o, x_norm, delta_encoder_pair_rep_norm,iter_i)
         (loss_t, token_loss, crystal_loss, coord_loss, temp_loss,press_loss,norm_x,norm_pair) = loss
         gradients = tape.gradient(loss_t, score_model.trainable_variables)
         optimizer.apply_gradients(zip(gradients, score_model.trainable_variables))
@@ -118,7 +118,7 @@ def train_step(label_o, token_o, coord_o, temp_o,press_o):
 def main(epochs):
     print("UOP main-- Hello! this is UOP main!")
     dir_prefixes = ["./Data/Paracetamol/", "./Data/Urea/"]
-    filename_log = open('./train.log','a')
+    filename_log = open('./train_v3.log','a')
     for epoch in range(epochs):
         start = time.time()
         train_total_loss.reset_states()
@@ -136,11 +136,11 @@ def main(epochs):
         #        print(f"UOP main--  {f}")
         print("UOP main--===================================")
         ##===========================================##
-        batch_data = colletor.Generate_batch(batch_size=10,Repeat_size=1,shuffle_size=1000)
+        batch_data = colletor.Generate_batch(batch_size=5,Repeat_size=1,shuffle_size=1000)
         for (batch, (local_label,local_temp,local_press,local_elements,local_coords)) in enumerate(batch_data):
             #tf.print("test")
             train_step(local_label, local_elements, local_coords, local_temp, local_press)
-            if batch%50 ==0:
+            if batch %50 == 0:
                 tf.print("Epoch:",epoch+1,"batch:",batch,"lr:",optimizer.learning_rate.numpy(),
                         "loss:",train_total_loss.result(), "token:",train_token_loss.result(),":", train_token_labl.result()*100,"%",
                         "noise:",train_noise_loss.result(),#"crystal:",train_cryst_loss.result(),":",train_accur_labl.result()*100,"%",
