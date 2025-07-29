@@ -1,4 +1,4 @@
-import tensorflow as tf
+import gc,tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 import numpy as np
@@ -66,7 +66,7 @@ if ckpt_manager.latest_checkpoint:
     ckpt.restore(ckpt_manager.latest_checkpoint)
     print ('Latest checkpoint restored!!')
 
-l_r = 0.00003 # CustomSchedule(512)
+l_r = 0.0001 # CustomSchedule(512)
 optimizer = tf.keras.optimizers.Adam(learning_rate=l_r, beta_1=0.9, beta_2=0.98,
                                      epsilon=1e-9)
 train_total_loss = tf.keras.metrics.Mean(name='total_loss')
@@ -83,11 +83,20 @@ Noise_creator = create_masks(max_noiseS,token_noise=0.1, iterT = max_iterT, trai
 Noise_test_creator = create_masks(max_noiseS,token_noise=0.1, iterT = max_iterT, training=False)
 loss_function = loss_1(1,0.8,0,1,1,max_iterT)
 
-@tf.function
+@tf.function(
+        input_signature=[
+            tf.TensorSpec([None], tf.int32),                       # label_o
+            tf.TensorSpec([None, max_neighbor+4, 1], tf.int32),    # token_o
+            tf.TensorSpec([None, max_neighbor+4, 3], tf.float32),  # coord_o
+            tf.TensorSpec([None], tf.float32),                     # temp_o
+            tf.TensorSpec([None], tf.float32)                      # press_o
+        ],experimental_relax_shapes=True
+        )
 def train_step(label_o, token_o, coord_o, temp_o,press_o):
-    bsz = token_o.shape[0]
-    Natom_l = token_o.shape[1]
-    token_o = tf.reshape(token_o,[bsz,Natom_l])
+    #bsz = token_o.shape[0]
+    #Natom_l = token_o.shape[1]
+    #token_o = tf.reshape(token_o,[bsz,Natom_l])
+    token_o = tf.squeeze(token_o, axis=-1)     # (bsz, Natom_l)
     #tf.print("UOP main-- label_o.shape",label_o.shape,"token_o.shape",token_o.shape,"coord_o.shape",coord_o.shape,"temp.shape",temp_o.shape,"press_o.shape",press_o.shape)
     
     (input_tokens,input_coords,noise,iter_i) = Noise_creator.Create_noise(token_o,coord_o)
@@ -127,7 +136,7 @@ def main(epochs):
 #        train_cryst_loss.reset_states()
 #        train_accur_labl.reset_states()
         train_token_labl.reset_states()
-        colletor = Data_Feeder(dir_prefixes,cutoff = 8,max_neighbor=max_neighbor,each_system_batch=1)
+        colletor = Data_Feeder(dir_prefixes,cutoff = 8,max_neighbor=max_neighbor,each_system_batch=10)
         ##===========================================##
         files_in_each_dir = colletor.get_files()
         #for idx, file_list in enumerate(files_in_each_dir):
@@ -150,9 +159,13 @@ def main(epochs):
                         "loss:",train_total_loss.result(), "token:",train_token_loss.result(),":", train_token_labl.result()*100,"%",
                         "noise:",train_noise_loss.result(),#"crystal:",train_cryst_loss.result(),":",train_accur_labl.result()*100,"%",
                         "temp:",train_temp_loss.result(),"press:",train_pres_loss.result(),"norm_x:",train_normx_loss.result(),"norm_pair:",train_normpair_loss.result())
-            #tf.keras.backend.clear_session()
-        ckpt_save_path = ckpt_manager.save()
-        tf.print('Saving checkpoint for epoch {} at {}'.format(epoch+1,ckpt_save_path))
+        tf.keras.backend.clear_session()
+        gc.collect()
+        if batch%5 == 0:
+            ckpt_save_path = ckpt_manager.save()
+            tf.print('Saving checkpoint for epoch {} at {}'.format(epoch+1,ckpt_save_path))
+        filename_log.flush()
+        os.fsync(filename_log.fileno())
 #    test_colletor = Data_Feeder(dir_prefixes,cutoff = 8,max_neighbor=max_neighbor,each_system_batch=1)
 #    test_batch_data = colletor.Generate_test_batch(batch_size=1)
 #    sample_n = 2
@@ -169,7 +182,7 @@ def main(epochs):
 #            tf.print(x_t,summarize=500000)
 #        if sample_i >= sample_n:
 #            break
-#        #tf.keras.backend.clear_session()
+#       # tf.keras.backend.clear_session()
 
 if __name__ == "__main__":
-    main(1)
+    main(50)

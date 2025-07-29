@@ -1,0 +1,310 @@
+
+***************************************************************
+*                 Welcome to use GPUMD                        *
+*     (Graphics Processing Units Molecular Dynamics)          *
+*                     version 4.2                             *
+*              This is the gpumd executable                   *
+***************************************************************
+
+
+---------------------------------------------------------------
+Compiling options:
+---------------------------------------------------------------
+
+DEBUG is off: Use different PRNG seeds for different runs.
+
+---------------------------------------------------------------
+GPU information:
+---------------------------------------------------------------
+
+number of GPUs = 1
+Device id:                   0
+    Device name:             Tesla V100S-PCIE-32GB
+    Compute capability:      7.0
+    Amount of global memory: 31.7325 GB
+    Number of SMs:           80
+
+---------------------------------------------------------------
+Started running GPUMD.
+---------------------------------------------------------------
+
+
+---------------------------------------------------------------
+Started initializing positions and related parameters.
+---------------------------------------------------------------
+
+Number of atoms is 1920.
+Use periodic boundary conditions along x.
+Use periodic boundary conditions along y.
+Use periodic boundary conditions along z.
+Box matrix h = [a, b, c] is
+    2.3385934370e+01    0.0000000000e+00    0.0000000000e+00
+    0.0000000000e+00    3.0460218970e+01    0.0000000000e+00
+    0.0000000000e+00    0.0000000000e+00    2.7967588380e+01
+Inverse box matrix g = inv(h) is
+    4.2760746018e-02    0.0000000000e+00    0.0000000000e+00
+    0.0000000000e+00    3.2829704901e-02    0.0000000000e+00
+    0.0000000000e+00    0.0000000000e+00    3.5755674977e-02
+Specify initial velocities here.
+Have no grouping method.
+There are 89 atom types.
+    864 atoms of type 0.
+    0 atoms of type 1.
+    0 atoms of type 2.
+    0 atoms of type 3.
+    0 atoms of type 4.
+    768 atoms of type 5.
+    96 atoms of type 6.
+    192 atoms of type 7.
+    0 atoms of type 8.
+    0 atoms of type 9.
+    0 atoms of type 10.
+    0 atoms of type 11.
+    0 atoms of type 12.
+    0 atoms of type 13.
+    0 atoms of type 14.
+    0 atoms of type 15.
+    0 atoms of type 16.
+    0 atoms of type 17.
+    0 atoms of type 18.
+    0 atoms of type 19.
+    0 atoms of type 20.
+    0 atoms of type 21.
+    0 atoms of type 22.
+    0 atoms of type 23.
+    0 atoms of type 24.
+    0 atoms of type 25.
+    0 atoms of type 26.
+    0 atoms of type 27.
+    0 atoms of type 28.
+    0 atoms of type 29.
+    0 atoms of type 30.
+    0 atoms of type 31.
+    0 atoms of type 32.
+    0 atoms of type 33.
+    0 atoms of type 34.
+    0 atoms of type 35.
+    0 atoms of type 36.
+    0 atoms of type 37.
+    0 atoms of type 38.
+    0 atoms of type 39.
+    0 atoms of type 40.
+    0 atoms of type 41.
+    0 atoms of type 42.
+    0 atoms of type 43.
+    0 atoms of type 44.
+    0 atoms of type 45.
+    0 atoms of type 46.
+    0 atoms of type 47.
+    0 atoms of type 48.
+    0 atoms of type 49.
+    0 atoms of type 50.
+    0 atoms of type 51.
+    0 atoms of type 52.
+    0 atoms of type 53.
+    0 atoms of type 54.
+    0 atoms of type 55.
+    0 atoms of type 56.
+    0 atoms of type 57.
+    0 atoms of type 58.
+    0 atoms of type 59.
+    0 atoms of type 60.
+    0 atoms of type 61.
+    0 atoms of type 62.
+    0 atoms of type 63.
+    0 atoms of type 64.
+    0 atoms of type 65.
+    0 atoms of type 66.
+    0 atoms of type 67.
+    0 atoms of type 68.
+    0 atoms of type 69.
+    0 atoms of type 70.
+    0 atoms of type 71.
+    0 atoms of type 72.
+    0 atoms of type 73.
+    0 atoms of type 74.
+    0 atoms of type 75.
+    0 atoms of type 76.
+    0 atoms of type 77.
+    0 atoms of type 78.
+    0 atoms of type 79.
+    0 atoms of type 80.
+    0 atoms of type 81.
+    0 atoms of type 82.
+    0 atoms of type 83.
+    0 atoms of type 84.
+    0 atoms of type 85.
+    0 atoms of type 86.
+    0 atoms of type 87.
+    0 atoms of type 88.
+Initialized velocities with data in model.xyz.
+
+---------------------------------------------------------------
+Finished initializing positions and related parameters.
+---------------------------------------------------------------
+
+
+---------------------------------------------------------------
+Started executing the commands in run.in.
+---------------------------------------------------------------
+
+Use the NEP4 potential with 89 atom types.
+    type 0 (H with Z = 1).
+    type 1 (He with Z = 2).
+    type 2 (Li with Z = 3).
+    type 3 (Be with Z = 4).
+    type 4 (B with Z = 5).
+    type 5 (C with Z = 6).
+    type 6 (N with Z = 7).
+    type 7 (O with Z = 8).
+    type 8 (F with Z = 9).
+    type 9 (Ne with Z = 10).
+    type 10 (Na with Z = 11).
+    type 11 (Mg with Z = 12).
+    type 12 (Al with Z = 13).
+    type 13 (Si with Z = 14).
+    type 14 (P with Z = 15).
+    type 15 (S with Z = 16).
+    type 16 (Cl with Z = 17).
+    type 17 (Ar with Z = 18).
+    type 18 (K with Z = 19).
+    type 19 (Ca with Z = 20).
+    type 20 (Sc with Z = 21).
+    type 21 (Ti with Z = 22).
+    type 22 (V with Z = 23).
+    type 23 (Cr with Z = 24).
+    type 24 (Mn with Z = 25).
+    type 25 (Fe with Z = 26).
+    type 26 (Co with Z = 27).
+    type 27 (Ni with Z = 28).
+    type 28 (Cu with Z = 29).
+    type 29 (Zn with Z = 30).
+    type 30 (Ga with Z = 31).
+    type 31 (Ge with Z = 32).
+    type 32 (As with Z = 33).
+    type 33 (Se with Z = 34).
+    type 34 (Br with Z = 35).
+    type 35 (Kr with Z = 36).
+    type 36 (Rb with Z = 37).
+    type 37 (Sr with Z = 38).
+    type 38 (Y with Z = 39).
+    type 39 (Zr with Z = 40).
+    type 40 (Nb with Z = 41).
+    type 41 (Mo with Z = 42).
+    type 42 (Tc with Z = 43).
+    type 43 (Ru with Z = 44).
+    type 44 (Rh with Z = 45).
+    type 45 (Pd with Z = 46).
+    type 46 (Ag with Z = 47).
+    type 47 (Cd with Z = 48).
+    type 48 (In with Z = 49).
+    type 49 (Sn with Z = 50).
+    type 50 (Sb with Z = 51).
+    type 51 (Te with Z = 52).
+    type 52 (I with Z = 53).
+    type 53 (Xe with Z = 54).
+    type 54 (Cs with Z = 55).
+    type 55 (Ba with Z = 56).
+    type 56 (La with Z = 57).
+    type 57 (Ce with Z = 58).
+    type 58 (Pr with Z = 59).
+    type 59 (Nd with Z = 60).
+    type 60 (Pm with Z = 61).
+    type 61 (Sm with Z = 62).
+    type 62 (Eu with Z = 63).
+    type 63 (Gd with Z = 64).
+    type 64 (Tb with Z = 65).
+    type 65 (Dy with Z = 66).
+    type 66 (Ho with Z = 67).
+    type 67 (Er with Z = 68).
+    type 68 (Tm with Z = 69).
+    type 69 (Yb with Z = 70).
+    type 70 (Lu with Z = 71).
+    type 71 (Hf with Z = 72).
+    type 72 (Ta with Z = 73).
+    type 73 (W with Z = 74).
+    type 74 (Re with Z = 75).
+    type 75 (Os with Z = 76).
+    type 76 (Ir with Z = 77).
+    type 77 (Pt with Z = 78).
+    type 78 (Au with Z = 79).
+    type 79 (Hg with Z = 80).
+    type 80 (Tl with Z = 81).
+    type 81 (Pb with Z = 82).
+    type 82 (Bi with Z = 83).
+    type 83 (Ac with Z = 89).
+    type 84 (Th with Z = 90).
+    type 85 (Pa with Z = 91).
+    type 86 (U with Z = 92).
+    type 87 (Np with Z = 93).
+    type 88 (Pu with Z = 94).
+    has the universal ZBL with inner cutoff 1 A and outer cutoff 2 A.
+    radial cutoff = 6 A.
+    angular cutoff = 5 A.
+    MN_radial = 274.
+    enlarged MN_radial = 343.
+    enlarged MN_angular = 198.
+    n_max_radial = 4.
+    n_max_angular = 4.
+    basis_size_radial = 8.
+    basis_size_angular = 8.
+    l_max_3body = 4.
+    l_max_4body = 2.
+    l_max_5body = 1.
+    ANN = 35-80-1.
+    number of neural network parameters = 263441.
+    number of descriptor parameters = 712890.
+    total number of parameters = 976331.
+Time step for this run is 1 fs.
+Dump extended XYZ.
+    every 1000 steps.
+    with velocity data.
+    without force data.
+    without potential data.
+    dump_exyz into separated dump.*.xyz.
+Use Nose-Hoover thermostat and Parrinello-Rahman barostat.
+Use NPT ensemble for this run.
+Thermostat: t_start is 450.000000, t_stop is 450.000000, t_period is 100.000000 timesteps
+xx : p_start is 0.250000, p_stop is 0.250000, p_period is 1000.000000 timesteps
+xy will not be changed.
+xz will not be changed.
+yx will not be changed.
+yy : p_start is 0.250000, p_stop is 0.250000, p_period is 1000.000000 timesteps
+yz will not be changed.
+zx will not be changed.
+zy will not be changed.
+zz : p_start is 0.250000, p_stop is 0.250000, p_period is 1000.000000 timesteps
+Dump thermo every 1000 steps.
+Run 100000 steps.
+MTTK initializing...
+    10000 steps completed.
+    20000 steps completed.
+    30000 steps completed.
+    40000 steps completed.
+    50000 steps completed.
+    60000 steps completed.
+    70000 steps completed.
+    80000 steps completed.
+    90000 steps completed.
+    100000 steps completed.
+
+---------------------------------------------------------------
+Time used for this run = 234.702 second.
+Speed of this run = 818059 atom*step/second.
+---------------------------------------------------------------
+
+
+---------------------------------------------------------------
+Finished executing the commands in run.in.
+---------------------------------------------------------------
+
+
+---------------------------------------------------------------
+Time used = 235.341060 s.
+---------------------------------------------------------------
+
+
+---------------------------------------------------------------
+Finished running GPUMD.
+---------------------------------------------------------------
+

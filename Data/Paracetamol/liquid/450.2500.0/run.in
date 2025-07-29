@@ -1,0 +1,14 @@
+#potential   /home/liwenli/scratch/GPUMD/model/nep-data-main-2023_Xu_liquid_water/2023_Xu_liquid_water/nep.txt
+#potential deepmd /home/liwenli/scratch/GPUMD/model/dp_MB_POT_water/graph.pb
+potential /home/liwenli/scratch/GPUMD/GPUMD-4.2/potentials/nep/nep89_20250409/nep89_20250409.txt
+
+velocity    450
+time_step 1.0
+#dump_xyz -1 1 1000 position.xyz
+dump_exyz 1000 1 0 0 1
+#ensemble    nvt_nhc 300 300 100
+ensemble npt_mttk temp 450 450 aniso 0.25 0.25 tperiod 100 pperiod 1000
+#time_step   1
+dump_thermo 1000
+#dump_velocity 10
+run         100000
