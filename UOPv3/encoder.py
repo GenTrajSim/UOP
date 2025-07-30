@@ -134,7 +134,7 @@ class TransformerEncoderWithPair(tf.keras.layers.Layer):
                 padding_mask = tf.expand_dims(padding_mask, axis=1)
                 padding_mask = tf.expand_dims(padding_mask, axis=2)
                 padding_mask = tf.cast(padding_mask, tf.bool)
-                attn_mask = tf.where(padding_mask, tf.cast(fill_val, dtype=tf.float32), attn_mask)
+                attn_mask = tf.where(padding_mask, tf.cast(fill_val, dtype=attn_mask.dtype), attn_mask)
                 attn_mask = tf.reshape(attn_mask, (-1, seq_len, seq_len))
                 padding_mask = None
             return attn_mask, padding_mask
@@ -145,8 +145,8 @@ class TransformerEncoderWithPair(tf.keras.layers.Layer):
                 x, padding_mask=padding_mask, attn_bias=attn_mask, training = training, return_attn=True
             )
         def norm_loss(x, eps=1e-10, tolerance=1.0):
-            x = tf.cast(x, tf.float32)
-            max_norm = tf.sqrt(tf.cast((tf.shape(x)[-1]),tf.float32))
+            x = tf.cast(x, dtype=x.dtype)
+            max_norm = tf.sqrt(tf.cast((tf.shape(x)[-1]), dtype=x.dtype))
             norm = tf.sqrt(tf.reduce_sum(x**2, -1) + eps)
             error = tf.nn.relu(tf.abs(norm - max_norm)-tolerance)
             return error
@@ -156,7 +156,7 @@ class TransformerEncoderWithPair(tf.keras.layers.Layer):
             )
         x_norm = norm_loss(x)
         if input_padding_mask is not None:
-            token_mask = 1.0 - tf.cast(input_padding_mask, tf.float32)
+            token_mask = 1.0 - tf.cast(input_padding_mask, dtype=x.dtype)
         else:
             token_mask = tf.ones_like(x_norm)
         x_norm = masked_mean(token_mask, x_norm)

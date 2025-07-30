@@ -32,6 +32,8 @@ class GaussianLayer(tf.keras.layers.Layer):
         x = tf.tile(x, [1, 1, 1, self.K])
         mean = tf.reshape(self.means.weights[0], [-1])
         std = tf.math.abs(tf.reshape(self.stds.weights[0], [-1])) + 1e-5
+        mean = tf.cast(mean, x.dtype)
+        std = tf.cast(std, x.dtype)
         return gaussian(x, mean, std)
         '''
         input-> x:(bsz, N, N) 
@@ -68,7 +70,7 @@ class MaskLMHead(tf.keras.layers.Layer):
         #print(tf.shape(self.weight))
         #print("self.bias = ")
         #print(self.bias)
-        x = tf.matmul(x, self.weight) + self.bias
+        x = tf.matmul(x, tf.cast(self.weight,dtype=x.dtype)) + tf.cast(self.bias,dtype=x.dtype)
         #x = self.weight(x) + self.bias
         return x
 

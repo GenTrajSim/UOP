@@ -57,7 +57,7 @@ class loss_1:
         #)
         ## MASK iterT 
         #mask_iterT = tf.cast(tf.equal(iter_T, 1), tf.float32)
-        mask_iterT = (self.max_iter_T - tf.cast(iter_T, tf.float32)) / (self.max_iter_T - 1)
+        mask_iterT = (self.max_iter_T - tf.cast(iter_T, dtype=pred_token.dtype )) / (self.max_iter_T - 1)
         mask_iterT = tf.clip_by_value(mask_iterT, 0.0, 1.0)
         # crystal
         crystal_loss = self.loss_object_cry(origin_cry,tf.nn.log_softmax(pred_cry,axis=-1))

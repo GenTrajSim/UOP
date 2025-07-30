@@ -10,6 +10,9 @@ from .XYZdata import *
 from .encoder import *
 from .model import *
 from .self_attention import *
+from tensorflow.keras import mixed_precision
+policy = mixed_precision.Policy('float32')
+mixed_precision.set_global_policy(policy)
 
 max_neighbor = 80
 max_iterT = 100
@@ -66,7 +69,7 @@ if ckpt_manager.latest_checkpoint:
     ckpt.restore(ckpt_manager.latest_checkpoint)
     print ('Latest checkpoint restored!!')
 
-l_r = 0.0001 # CustomSchedule(512)
+l_r = 0.00006 # CustomSchedule(512)
 optimizer = tf.keras.optimizers.Adam(learning_rate=l_r, beta_1=0.9, beta_2=0.98,
                                      epsilon=1e-9)
 train_total_loss = tf.keras.metrics.Mean(name='total_loss')
@@ -145,7 +148,7 @@ def main(epochs):
         #        print(f"UOP main--  {f}")
         print("UOP main--===================================")
         ##===========================================##
-        batch_data = colletor.Generate_batch(batch_size=5,Repeat_size=1,shuffle_size=1000)
+        batch_data = colletor.Generate_batch(batch_size=10,Repeat_size=1,shuffle_size=10000)
         for (batch, (local_label,local_temp,local_press,local_elements,local_coords)) in enumerate(batch_data):
             #tf.print("test")
             train_step(local_label, local_elements, local_coords, local_temp, local_press)
@@ -161,9 +164,9 @@ def main(epochs):
                         "temp:",train_temp_loss.result(),"press:",train_pres_loss.result(),"norm_x:",train_normx_loss.result(),"norm_pair:",train_normpair_loss.result())
         tf.keras.backend.clear_session()
         gc.collect()
-        if batch%5 == 0:
-            ckpt_save_path = ckpt_manager.save()
-            tf.print('Saving checkpoint for epoch {} at {}'.format(epoch+1,ckpt_save_path))
+        #if batch%5 == 0:
+        ckpt_save_path = ckpt_manager.save()
+        tf.print('Saving checkpoint for epoch {} at {}'.format(epoch+1,ckpt_save_path))
         filename_log.flush()
         os.fsync(filename_log.fileno())
 #    test_colletor = Data_Feeder(dir_prefixes,cutoff = 8,max_neighbor=max_neighbor,each_system_batch=1)
@@ -185,4 +188,4 @@ def main(epochs):
 #       # tf.keras.backend.clear_session()
 
 if __name__ == "__main__":
-    main(50)
+    main(5)
