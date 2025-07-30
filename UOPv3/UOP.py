@@ -69,18 +69,18 @@ if ckpt_manager.latest_checkpoint:
     ckpt.restore(ckpt_manager.latest_checkpoint)
     print ('Latest checkpoint restored!!')
 
-l_r = 0.00006 # CustomSchedule(512)
+l_r = 0.000056 # CustomSchedule(512)
 optimizer = tf.keras.optimizers.Adam(learning_rate=l_r, beta_1=0.9, beta_2=0.98,
                                      epsilon=1e-9)
 train_total_loss = tf.keras.metrics.Mean(name='total_loss')
 train_token_loss = tf.keras.metrics.Mean(name='token_loss')
 train_noise_loss = tf.keras.metrics.Mean(name='noise_loss')
-#train_cryst_loss = tf.keras.metrics.Mean(name='cryst_loss')
+train_cryst_loss = tf.keras.metrics.Mean(name='cryst_loss')
 train_temp_loss = tf.keras.metrics.Mean(name='temp_loss')
 train_pres_loss = tf.keras.metrics.Mean(name='press_loss')
 train_normx_loss = tf.keras.metrics.Mean(name='norm_x_loss')
 train_normpair_loss = tf.keras.metrics.Mean(name='norm_pair_loss')
-#train_accur_labl = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
+train_accur_labl = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
 train_token_labl = tf.keras.metrics.SparseCategoricalAccuracy(name='train_token_accuracy')
 Noise_creator = create_masks(max_noiseS,token_noise=0.1, iterT = max_iterT, training=True)
 Noise_test_creator = create_masks(max_noiseS,token_noise=0.1, iterT = max_iterT, training=False)
@@ -110,19 +110,19 @@ def train_step(label_o, token_o, coord_o, temp_o,press_o):
         (token_p, label_p, temp_p, press_p, noise_p, x_norm, delta_encoder_pair_rep_norm) = out
         #tf.print("UOP main-- token_p.shape",token_p.shape,"label_p.shape",label_p.shape,"temp_p.shape",temp_p.shape,"press_p.shape",press_p.shape,"noise_p.shape",noise_p.shape,"x_norm:",x_norm,"delta_encoder_pair_rep_norm:",delta_encoder_pair_rep_norm)
         loss = loss_function.ca_loss(token_p, token_o, noise_p, coord_o, noise, label_p, label_o, temp_p,temp_o, press_p,press_o, x_norm, delta_encoder_pair_rep_norm,iter_i)
-        (loss_t, token_loss, crystal_loss, coord_loss, temp_loss,press_loss,norm_x,norm_pair) = loss
+        (loss_t, token_loss, crystal_loss, coord_loss, temp_loss,press_loss,norm_x,norm_pair,crystal_loss) = loss
         gradients = tape.gradient(loss_t, score_model.trainable_variables)
         optimizer.apply_gradients(zip(gradients, score_model.trainable_variables))
         train_total_loss(loss_t)
         train_token_loss(token_loss)
         train_noise_loss(coord_loss)
-#        train_cryst_loss(crystal_loss)
+        train_cryst_loss(crystal_loss)
         train_temp_loss(temp_loss)
         train_pres_loss(press_loss)
         train_normx_loss(norm_x)
         train_normpair_loss(norm_pair)
         #tf.print("UOP main-- label_p vs label_o .shape",label_p.shape,label_o.shape)
-#        train_accur_labl(label_o,label_p)
+        train_accur_labl(label_o,label_p)
         #tf.print("UOP main-- token_p vs token_o .shape",token_p.shape,token_o.shape)
         train_token_labl(token_o,token_p)
     #
@@ -136,8 +136,8 @@ def main(epochs):
         train_total_loss.reset_states()
         train_token_loss.reset_states()
         train_noise_loss.reset_states()
-#        train_cryst_loss.reset_states()
-#        train_accur_labl.reset_states()
+        train_cryst_loss.reset_states()
+        train_accur_labl.reset_states()
         train_token_labl.reset_states()
         colletor = Data_Feeder(dir_prefixes,cutoff = 8,max_neighbor=max_neighbor,each_system_batch=10)
         ##===========================================##
@@ -157,11 +157,13 @@ def main(epochs):
                         "loss:",train_total_loss.result(), "token:",train_token_loss.result(),":", train_token_labl.result()*100,"%",
                         "noise:",train_noise_loss.result(),#"crystal:",train_cryst_loss.result(),":",train_accur_labl.result()*100,"%",
                         "temp:",train_temp_loss.result(),"press:",train_pres_loss.result(),"norm_x:",train_normx_loss.result(),"norm_pair:",train_normpair_loss.result(),
+                        "crystal:",train_cryst_loss.result(),train_accur_labl.result(),
                         output_stream='file://'+filename_log.name)
                 tf.print("Epoch:",epoch+1,"batch:",batch,"lr:",optimizer.learning_rate.numpy(),
                         "loss:",train_total_loss.result(), "token:",train_token_loss.result(),":", train_token_labl.result()*100,"%",
                         "noise:",train_noise_loss.result(),#"crystal:",train_cryst_loss.result(),":",train_accur_labl.result()*100,"%",
-                        "temp:",train_temp_loss.result(),"press:",train_pres_loss.result(),"norm_x:",train_normx_loss.result(),"norm_pair:",train_normpair_loss.result())
+                        "temp:",train_temp_loss.result(),"press:",train_pres_loss.result(),"norm_x:",train_normx_loss.result(),"norm_pair:",train_normpair_loss.result(),
+                        "crystal:",train_cryst_loss.result(),train_accur_labl.result())
         tf.keras.backend.clear_session()
         gc.collect()
         #if batch%5 == 0:

@@ -71,7 +71,7 @@ class loss_1:
         loss_press = tf.reduce_sum(loss_press * mask_iterT) / (tf.reduce_sum(mask_iterT) + 1e-8)
         ##
         loss = token_loss + (coord_loss*2)  + (norm_x + norm_pair)*0.001 + 0.00000001*(crystal_loss + loss_temp + loss_press) 
-        return loss, token_loss, crystal_loss, coord_loss, loss_temp,loss_press,norm_x,norm_pair
+        return loss, token_loss, crystal_loss, coord_loss, loss_temp,loss_press,norm_x,norm_pair,crystal_loss
 
 if __name__ == "__main__":
     loss_function = loss_1(1,0.8,4,1,1)
