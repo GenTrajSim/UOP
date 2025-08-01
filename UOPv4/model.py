@@ -172,7 +172,7 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
             delta_encoder_pair_rep_norm,
         ) = self.encoder(x, padding_mask=padding_mask, attn_mask=graph_attn_bias,training = training)
         #encoder_pair_rep[encoder_pair_rep == float("-inf")] = 0
-        encoder_pair_rep = tf.where(tf.math.is_finite(encoder_pair_rep), encoder_pair_rep, tf.cast(tf.zeros_like(encoder_pair_rep),dtype=tf.float32))
+        encoder_pair_rep = tf.where(tf.math.is_finite(encoder_pair_rep), encoder_pair_rep, tf.cast(tf.zeros_like(encoder_pair_rep),dtype=encoder_pair_rep.dtype))
         encoder_distance = None
         encoder_coord = None
         #if not features_only:
@@ -188,7 +188,7 @@ class Gen3Dmol_Classify(tf.keras.layers.Layer):
             delta_pos = tf.expand_dims(coords_emb, axis=1) - tf.expand_dims(coords_emb, axis=2)
             delta_encoder_pair_rep.set_shape([None, None, None, self.encoder_attention_heads])
             attn_probs = self.pair2coord_proj(delta_encoder_pair_rep)
-            coord_update = delta_pos / atom_num * attn_probs
+            coord_update = tf.cast( delta_pos ,dtype=attn_probs.dtype)/ atom_num * attn_probs
             coord_update = tf.reduce_sum(coord_update, axis=2)
             up_noise = self.update_nosie(coord_update)
             #encoder_coord = coords_emb + coord_update   ###### coord_update noise output

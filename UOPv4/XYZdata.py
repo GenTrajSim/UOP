@@ -9,7 +9,7 @@ from ase.neighborlist import neighbor_list
 #print(data_test)
 
 class XYZ_reader:
-    def __init__(self,filename):
+    def __init__(self,filename,dictionary={'MASK':0, 'C':1, 'O':2, 'N':3, 'H':4, 'CLAS':5, 'TEMP':6, 'PRESS':7}):
         super(XYZ_reader).__init__()
         self.filename = filename
         self.Natom = None
@@ -18,7 +18,7 @@ class XYZ_reader:
         self.coords = None
         self.elements = None
         self.elements_ids = None
-        self.dictionary = {'MASK':0, 'C':1, 'O':2, 'N':3, 'H':4, 'CLAS':5, 'TEMP':6, 'PRESS':7}
+        self.dictionary = dictionary # {'MASK':0, 'C':1, 'O':2, 'N':3, 'H':4, 'CLAS':5, 'TEMP':6, 'PRESS':7}
         self._read_file()
     def _read_file(self):
         with open(self.filename,'r') as f:
@@ -75,9 +75,9 @@ class XYZ_reader:
         local_token = []
         local_coord = []
         local_token = np.full((self.Natom,max_neighbor+4,1),self.dictionary['MASK'],dtype=int)
-        local_token[:,0,0] = 5
-        local_token[:,1,0] = 6
-        local_token[:,2,0] = 7
+        local_token[:,0,0] = self.dictionary['CLAS'] #5
+        local_token[:,1,0] = self.dictionary['TEMP'] #6
+        local_token[:,2,0] = self.dictionary['PRESS'] #7
         local_coord = np.zeros((self.Natom,max_neighbor+4,3),dtype=float)
         #local_coord[:,0:4,:] = 0
         idx_i,idx_j,offsets = neighbor_list('ijS',self.ase_atoms,cutoff)

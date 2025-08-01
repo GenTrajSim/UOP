@@ -69,7 +69,7 @@ if ckpt_manager.latest_checkpoint:
     ckpt.restore(ckpt_manager.latest_checkpoint)
     print ('Latest checkpoint restored!!')
 
-l_r = 0.000056 # CustomSchedule(512)
+l_r = 0.00002 # CustomSchedule(512)
 optimizer = tf.keras.optimizers.Adam(learning_rate=l_r, beta_1=0.9, beta_2=0.98,
                                      epsilon=1e-9)
 train_total_loss = tf.keras.metrics.Mean(name='total_loss')
@@ -82,8 +82,8 @@ train_normx_loss = tf.keras.metrics.Mean(name='norm_x_loss')
 train_normpair_loss = tf.keras.metrics.Mean(name='norm_pair_loss')
 train_accur_labl = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
 train_token_labl = tf.keras.metrics.SparseCategoricalAccuracy(name='train_token_accuracy')
-Noise_creator = create_masks(max_noiseS,token_noise=0.1, iterT = max_iterT, training=True)
-Noise_test_creator = create_masks(max_noiseS,token_noise=0.1, iterT = max_iterT, training=False)
+Noise_creator = create_masks(max_noiseS,token_noise=0.1, iterT = max_iterT, training=True,dictionary=dictionary)
+Noise_test_creator = create_masks(max_noiseS,token_noise=0.1, iterT = max_iterT, training=False,dictionary=dictionary)
 loss_function = loss_1(1,0.8,0,1,1,max_iterT)
 
 @tf.function(
@@ -139,7 +139,7 @@ def main(epochs):
         train_cryst_loss.reset_states()
         train_accur_labl.reset_states()
         train_token_labl.reset_states()
-        colletor = Data_Feeder(dir_prefixes,cutoff = 8,max_neighbor=max_neighbor,each_system_batch=10)
+        colletor = Data_Feeder(dir_prefixes,cutoff = 8,max_neighbor=max_neighbor,each_system_batch=10, dictionary=dictionary)
         ##===========================================##
         files_in_each_dir = colletor.get_files()
         #for idx, file_list in enumerate(files_in_each_dir):
@@ -171,7 +171,7 @@ def main(epochs):
         tf.print('Saving checkpoint for epoch {} at {}'.format(epoch+1,ckpt_save_path))
         filename_log.flush()
         os.fsync(filename_log.fileno())
-#    test_colletor = Data_Feeder(dir_prefixes,cutoff = 8,max_neighbor=max_neighbor,each_system_batch=1)
+#    test_colletor = Data_Feeder(dir_prefixes,cutoff = 8,max_neighbor=max_neighbor,each_system_batch=1,dictionary=dictionary)
 #    test_batch_data = colletor.Generate_test_batch(batch_size=1)
 #    sample_n = 2
 #    sample_i = 0

@@ -70,7 +70,7 @@ class MaskLMHead(tf.keras.layers.Layer):
         #print(tf.shape(self.weight))
         #print("self.bias = ")
         #print(self.bias)
-        x = tf.matmul(x, self.weight) + self.bias
+        x = tf.matmul(x, tf.cast(self.weight,dtype=x.dtype)) + tf.cast(self.bias,dtype=x.dtype)
         #x = self.weight(x) + self.bias
         return x
 

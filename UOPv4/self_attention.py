@@ -52,7 +52,7 @@ class SelfMultiHeadAttention(tf.keras.layers.Layer):
         #
         #batch_size = tf.shape(q)[0]
         q = self.wq(query)
-        q = q*self.scaling
+        q = q*tf.cast(self.scaling ,dtype=q.dtype)
         k = self.wq(key)
         v = self.wq(value)
         q = self.split_heads(q, bsz)

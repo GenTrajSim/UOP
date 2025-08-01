@@ -19,7 +19,7 @@ class Data_Feeder(XYZ_reader):
     def __init__(
             self,
             dir_prefixes: List[str],
-            each_system_batch=10, max_neighbor=80, cutoff = 5, Traning = False):
+            each_system_batch=10, max_neighbor=80, cutoff = 5, Traning = False, dictionary = {'MASK':0, 'C':1, 'O':2, 'N':3, 'H':4, 'CLAS':5, 'TEMP':6, 'PRESS':7}):
         super(Data_Feeder).__init__()
         self.dir_prefixes = dir_prefixes
         self.files_in_each_dir = []
@@ -27,7 +27,7 @@ class Data_Feeder(XYZ_reader):
         self.each_system_batch = each_system_batch
         self.max_neighbor = max_neighbor
         self.cutoff = cutoff
-        self.dictionary = {'MASK':0, 'C':1, 'O':2, 'N':3, 'H':4, 'CLAS':5, 'TEMP':6, 'PRESS':7}
+        self.dictionary = dictionary # {'MASK':0, 'C':1, 'O':2, 'N':3, 'H':4, 'CLAS':5, 'TEMP':6, 'PRESS':7}
         #self.crystal = {'liquid':0, 'P'}
         self.Traning = Traning
         self._collect_files()
@@ -94,7 +94,7 @@ class Data_Feeder(XYZ_reader):
         for f in sampled_files:
             (label,temp,press,time,nextf) = self.read_lable(f)
             #print("DATA_info:",label,temp,press,time,nextf)
-            parser_current = XYZ_reader(f)
+            parser_current = XYZ_reader(f, self.dictionary)
             (local_elements_c, local_coords_c) = parser_current.get_local_env(self.max_neighbor,self.cutoff)
             #print("DATA_info:",local_elements_c.shape)
             #print("DATA_info:",local_coords_c.shape)
@@ -167,13 +167,13 @@ def get_next_filename(filepath, step=1000):
     return next_filepath
 
 class create_masks:
-    def __init__(self, noise_C,token_noise=0.2, iterT = 50, training=True):
+    def __init__(self, noise_C,token_noise=0.2, iterT = 50, training=True,dictionary = {'MASK':0, 'C':1, 'O':2, 'N':3, 'H':4, 'CLAS':5, 'TEMP':6, 'PRESS':7}):
         self.noise_C = noise_C
         self.token_noise = token_noise
         #self.noise_T = noise_T
         self.iterT = iterT
         self.training = training
-        self.dictionary = {'MASK':0, 'C':1, 'O':2, 'N':3, 'H':4, 'CLAS':5, 'TEMP':6, 'PRESS':7}
+        self.dictionary = dictionary # {'MASK':0, 'C':1, 'O':2, 'N':3, 'H':4, 'CLAS':5, 'TEMP':6, 'PRESS':7}
         betas = np.linspace(1e-5, self.noise_C, self.iterT+1,dtype=np.float32) #self.noise_C=0.02
         alphas= 1.0 - betas
         alpha_bars = np.cumprod(alphas,axis=0)
@@ -182,10 +182,10 @@ class create_masks:
         bsz = tf.shape(tokens_c)[0]
         Natom=tf.shape(tokens_c)[1]
         tokens_c = tf.reshape(tokens_c, [bsz,Natom])
-        NO_padding_mask = tf.cast(tf.not_equal(tokens_c, 0), dtype=tf.int32)
-        NO_padding_clas = tf.cast(tf.not_equal(tokens_c, 5), dtype=tf.int32)
-        NO_padding_temp = tf.cast(tf.not_equal(tokens_c, 6), dtype=tf.int32)
-        NO_padding_pres = tf.cast(tf.not_equal(tokens_c, 7), dtype=tf.int32)
+        NO_padding_mask = tf.cast(tf.not_equal(tokens_c, self.dictionary['MASK']), dtype=tf.int32)
+        NO_padding_clas = tf.cast(tf.not_equal(tokens_c, self.dictionary['CLAS']), dtype=tf.int32)
+        NO_padding_temp = tf.cast(tf.not_equal(tokens_c, self.dictionary['TEMP']), dtype=tf.int32)
+        NO_padding_pres = tf.cast(tf.not_equal(tokens_c, self.dictionary['PRESS']), dtype=tf.int32)
         NO_padding = NO_padding_mask*NO_padding_clas*NO_padding_temp*NO_padding_pres
         #
         random_MASK_Prob = tf.random.uniform(tf.shape(NO_padding_mask),dtype=tf.float32) < self.token_noise
