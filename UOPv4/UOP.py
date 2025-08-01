@@ -18,7 +18,7 @@ max_neighbor = 80
 max_iterT = 100
 max_noiseS = 0.003
 dictionary = {'MASK':0, 'C':1, 'O':2, 'N':3, 'H':4, 'CLAS':5, 'TEMP':6, 'PRESS':7}
-crystal = {'Paracetamol_I':0,'Paracetamol_II':1, 'Paracetamol_III':2, 'Urea_I':3, 'Urea_II':4, 'Urea_III':5, 'ice_0':6, 'ice_Ih':7,'ice_Ic':8}
+crystal = {'Liquid':0,'Paracetamol_I':1,'Paracetamol_II':2, 'Paracetamol_III':3, 'Urea_I':4, 'Urea_II':5, 'Urea_III':6, 'ice_0':7, 'ice_Ih':8,'ice_Ic':9}
 
 score_model = Gen3Dmol_Classify(
         encoder_layers = 15,
