@@ -18,7 +18,7 @@ max_neighbor = 80
 max_iterT = 100
 max_noiseS = 0.003
 dictionary = {'MASK':0, 'C':1, 'O':2, 'N':3, 'H':4, 'CLAS':5, 'TEMP':6, 'PRESS':7}
-crystal = {'Liquid':0,'Paracetamol_I':1,'Paracetamol_II':2, 'Paracetamol_III':3, 'Urea_I':4, 'Urea_II':5, 'Urea_III':6, 'ice_0':7, 'ice_Ih':8,'ice_Ic':9}
+crystal = {'Liquid':0,'Paracetamol_I':1,'Paracetamol_II':2, 'Paracetamol_III':3, 'Urea_I':4, 'Urea_II':5, 'Urea_III':6, 'ice_0':7, 'ice_Ih':8,'ice_Ic':9,'Hydrate_S1':10,'Hydrate_S2':11,'Hydrate_S3':12}
 
 score_model = Gen3Dmol_Classify(
         encoder_layers = 10,
@@ -69,7 +69,7 @@ if ckpt_manager.latest_checkpoint:
     ckpt.restore(ckpt_manager.latest_checkpoint)
     print ('Latest checkpoint restored!!')
 
-l_r = 0.00002 # CustomSchedule(512)
+l_r = 0.00006 # CustomSchedule(512)
 optimizer = tf.keras.optimizers.Adam(learning_rate=l_r, beta_1=0.9, beta_2=0.98,
                                      epsilon=1e-9)
 train_total_loss = tf.keras.metrics.Mean(name='total_loss')
